@@ -9,7 +9,7 @@ export async function fetchStudentData() {
     return res.json();
 }
 
-console.log("abcd", process.env.API_SERVER_URL);
+
 
 
 //add student data
