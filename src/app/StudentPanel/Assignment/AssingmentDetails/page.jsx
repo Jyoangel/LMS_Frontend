@@ -4,7 +4,7 @@ import Link from "next/link";
 
 import { useState } from "react";
 import { FaArrowLeftLong } from "react-icons/fa6";
-import { fetchAssignmentData } from "../../../../api/assignmentapi";
+
 
 export default function AssingmentDetails() {
   const [isSelectOpen, setisSelectOpen] = useState(false);
