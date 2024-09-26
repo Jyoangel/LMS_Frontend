@@ -20,24 +20,24 @@
 //     matcher: ['/protected/(.*)', "/StudentPanel/:path*"],
 // };
 // middleware.js
-import { NextResponse } from "next/server";
-import { getSession } from "@auth0/nextjs-auth0";
+// import { NextResponse } from "next/server";
+// import { getSession } from "@auth0/nextjs-auth0";
 
-export async function middleware(req) {
-    const session = await getSession(req, res);
+// export async function middleware(req) {
+//     const session = await getSession(req, res);
 
-    if (!session || !session.user) {
-        // Redirect the user to the login page if they are not authenticated
-        return NextResponse.redirect(new URL('/api/auth/login', req.url));
-    }
+//     if (!session || !session.user) {
+//         // Redirect the user to the login page if they are not authenticated
+//         return NextResponse.redirect(new URL('/api/auth/login', req.url));
+//     }
 
-    return NextResponse.next(); // Continue to the requested page if authenticated
-}
+//     return NextResponse.next(); // Continue to the requested page if authenticated
+// }
 
-// Apply middleware to all routes
-export const config = {
-    matcher: ["/profile/:path*"], // Adjust this to the routes you want to protect
-};
+// // Apply middleware to all routes
+// export const config = {
+//     matcher: ["/profile/:path*"], // Adjust this to the routes you want to protect
+// };
 
 {/*
 
