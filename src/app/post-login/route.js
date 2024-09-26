@@ -14,7 +14,7 @@ export async function GET(req) {
 
         const user = session.user;
         console.log(user);
-        const roles = user[`${AUTH0_BASE_URL}/roles`]; // Replace with the correct claim for roles from your Auth0 settings
+        const roles = user[`${process.env.AUTH0_BASE_URL}/roles`]; // Replace with the correct claim for roles from your Auth0 settings
         console.log(roles);
 
         // Redirect based on the user's role
