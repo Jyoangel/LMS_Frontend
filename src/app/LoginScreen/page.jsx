@@ -98,14 +98,14 @@ export default function LoginScreen() {
             </div>
             */}
             <div>
-              <Link href={"/api/auth/login"}>
+              <Link href={"/api/auth/auth0?action=login"}>
                 <button className="h-16 w-[90%] bg-blue-600 text-white text-md font-semibold rounded-lg">
                   Log In
                 </button>
               </Link>
             </div>
             <div>
-              <Link href={"/api/auth/signup"}>
+              <Link href={"/api/auth/auth0?action=signup"}>
                 <button className="h-16 w-[90%] bg-blue-600 text-white text-md font-semibold rounded-lg">
                   Sign Up
                 </button>
