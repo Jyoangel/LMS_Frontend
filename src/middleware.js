@@ -1,3 +1,20 @@
+// src/middleware.js
+
+import { NextResponse } from "next/server";
+
+// Define a simple middleware function
+export function middleware(req) {
+    // Allow all requests to continue
+    return NextResponse.next();
+}
+
+// Apply middleware to all routes
+export const config = {
+    matcher: ["/:path*"], // Apply to all routes (you can customize this)
+};
+
+
+
 // import { NextResponse } from 'next/server';
 // import { getSession } from '@auth0/nextjs-auth0';
 
