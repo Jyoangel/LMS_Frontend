@@ -23,7 +23,7 @@ export default function RootLayout({ children }) {
       return;
     }
 
-    const userRoles = user[`${AUTH0_BASE_URL}/roles`];
+    const userRoles = user[`${process.env.AUTH0_BASE_URL}/roles`];
     if (!userRoles || !userRoles.includes('Teacher')) {
       router.push('/'); // Redirect if not a teacher
       return;
