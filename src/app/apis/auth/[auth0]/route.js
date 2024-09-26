@@ -1,24 +1,24 @@
 // app/api/auth/[auth0]/route.js
 
 
-// import { handleAuth, handleLogin, handleLogout } from '@auth0/nextjs-auth0';
+import { handleAuth, handleLogin, handleLogout } from '@auth0/nextjs-auth0';
 
 
-// export const GET = handleAuth({
+export const GET = handleAuth({
 
-//     login: handleLogin({
-//         returnTo: '/post-login',
-//     }),
-//     signup: handleLogin({
-//         authorizationParams: {
-//             screen_hint: 'signup',
-//         },
-//         returnTo: '/post-login', // Redirect after signup
-//     }),
-//     logout: handleLogout({
-//         returnTo: '/', // Redirect to homepage after logout
-//     }),
-// });
+    login: handleLogin({
+        returnTo: '/post-login',
+    }),
+    signup: handleLogin({
+        authorizationParams: {
+            screen_hint: 'signup',
+        },
+        returnTo: '/post-login', // Redirect after signup
+    }),
+    logout: handleLogout({
+        returnTo: '/', // Redirect to homepage after logout
+    }),
+});
 
 
 
