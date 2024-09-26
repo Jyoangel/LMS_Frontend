@@ -25,7 +25,7 @@ export default function RootLayout({ children }) {
       return;
     }
 
-    const userRoles = user['https://localhost:3000/roles'];
+    const userRoles = user[`${AUTH0_BASE_URL}/roles`];
     if (!userRoles || !userRoles.includes('Admin')) {
       router.push('/'); // Redirect if not admin
       return;
