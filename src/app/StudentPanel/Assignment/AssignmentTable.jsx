@@ -83,7 +83,7 @@ export default function AssignmentTable({ filter, searchTerm }) {
                 <td className="py-4 px-6 text-left">{format(new Date(item.date), "yyyy-MM-dd")}|{item.time}</td>
                 <td className="py-4 px-6 text-left">{item.createdBy}</td>
                 <td className={`py-4 px-6 text-left flex gap-2  `}>
-                  <Link href={``${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/assignment/${item.uploadAssignment}`} target="_blank">
+                  <Link href={`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/assignment/${item.uploadAssignment}`} target="_blank">
                     <button>
                       <LiaFileDownloadSolid size={30} className="text-blue-600" />
                     </button>
