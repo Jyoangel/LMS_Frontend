@@ -56,7 +56,7 @@ export default function Dashboard() {
       try {
         // Hardcoded studentId for demonstration
         const studentId = '66cc0a5e9fae1990a3916b66'; // Replace with an actual studentId from your database
-        const response = await fetch(`http://localhost:5000/api/attendance/student/${studentId}`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/attendance/student/${studentId}`);
         const data = await response.json();
         console.log(data);
         setAttendanceData(data);
