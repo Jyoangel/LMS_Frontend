@@ -23,7 +23,7 @@ export default function RootLayout({ children }) {
       return;
     }
 
-    const userRoles = user[`${process.env.AUTH0_BASE_URL}/roles`];
+    const userRoles = user['https://coruscating-sunshine-25faaf.netlify.app/roles'];
     if (!userRoles || !userRoles.includes('Teacher')) {
       router.push('/'); // Redirect if not a teacher
       return;
