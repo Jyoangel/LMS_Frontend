@@ -105,7 +105,7 @@ export default function CourseTable({ filter, searchTerm }) {
                 <td className="py-4 px-6 text-left">{item.schedule.classDays.join(', ')}</td>
 
                 <td className={`py-4 px-6 text-left flex gap-2  `}>
-                  <Link href={`/AdminDashboard/Course/CourseEdit/${item._id}`}>
+                  <Link href={`/AdminDashboard/Course/EditCourse/${item._id}`}>
                     <button className="text-blue-600">
                       Edit
                     </button>{" "}
