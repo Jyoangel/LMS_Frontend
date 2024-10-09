@@ -16,18 +16,20 @@ export default function RootLayout({ children }) {
   const router = useRouter();
   const [isAdmin, setIsAdmin] = useState(null);
 
+
+
   // Function to add admin user data to the database
   // Function to add or update admin user data in the database
   const addOrUpdateAdminUser = async (adminData) => {
     try {
       // Check if the admin user already exists
-      const response = await fetch(`http://localhost:5000/api/user/adminUser/${adminData.userId}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/user/adminUser/${adminData.userId}`, {
         method: "GET",
       });
 
       if (response.ok) {
         // If user exists, update the user data
-        const updateResponse = await fetch(`http://localhost:5000/api/user/adminUser/${adminData.userId}`, {
+        const updateResponse = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/user/adminUser/${adminData.userId}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -40,7 +42,7 @@ export default function RootLayout({ children }) {
         }
       } else {
         // If user does not exist, add a new user
-        const addResponse = await fetch("http://localhost:5000/api/user/adminUser", {
+        const addResponse = await fetch("${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/user/adminUser", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
