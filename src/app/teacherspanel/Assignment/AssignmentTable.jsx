@@ -94,11 +94,11 @@ export default function AssignmentTable({ filter, searchTerm }) {
               >
                 <td className="py-4 px-6 text-left">{index + 1}</td>
                 <td className="py-4 px-6 text-left ">
-                  <Link href={`/AdminDashboard/LiveClassScreen/${item.courseName}`}>
-                    {item.assignmentCode}
-                  </Link>
+
+                  {item.assignmentCode}
+
                 </td>
-                <td className="py-4 px-6 text-left text-blue-500 underline ">
+                <td className="py-4 px-6 text-left  ">
                   {item.assignmentTitle}
                 </td>
                 <td className="py-4 px-6 text-left">{item.courseDescription}</td>

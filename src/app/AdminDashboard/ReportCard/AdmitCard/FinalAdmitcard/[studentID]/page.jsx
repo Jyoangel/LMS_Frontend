@@ -5,6 +5,7 @@ import { RxCrossCircled } from "react-icons/rx";
 import Image from "next/image";
 import logo from "../../logo.png";
 import { fetchAdmitCardByStudentID, fetchReportCardByStudentID, deleteAdmitCardData } from "../../../../../../../api/reportcardapi"; // api to fetch admitcard  report card by student ID and delete admit card  
+import { fetchAdminUser } from "../../../../../../../api/adminUser";// use to fetch admin details
 import { format } from "date-fns";
 import Link from "next/link";
 import { FaArrowLeftLong } from "react-icons/fa6";
@@ -14,6 +15,7 @@ export default function FinalAdmitcard({ params, onClose }) {
   const { studentID } = params; // StudentID
   const [admitCardData, setAdmitCardData] = useState(null);
   const [reportCardData, setReportCardData] = useState(null); // For report card data
+  const [adminUsers, setAdminUsers] = useState([]); // State for admin users
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [loadingReport, setLoadingReport] = useState(false); // To manage report card loading
@@ -83,6 +85,20 @@ export default function FinalAdmitcard({ params, onClose }) {
       });
   };
 
+  // Fetch admin users in a separate useEffect
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const adminUsers = await fetchAdminUser();
+        console.log(adminUsers); // Fetch admin users
+        setAdminUsers(adminUsers); // Store fetched admin users
+      } catch (error) {
+        console.error('Error fetching admin users:', error);
+      }
+    };
+
+    fetchUsers(); // Call the fetch function
+  }, []); // Empty dependency array means it runs only once when the component mounts
 
   // use to delete Admit card data
   const handleDeleteAdmitCard = () => {
@@ -150,8 +166,10 @@ export default function FinalAdmitcard({ params, onClose }) {
                   {/* Admit Card Info */}
 
                   <div className="flex flex-row gap-20">
-                    <Image src={logo} alt="Logo" />
-                    <h1 className="text-black text-lg font-bold">Soft Webtechs Solutions</h1>
+                    <Image src={adminUsers[0]?.picture} alt="Logo" className="h-[50px] w-[50px] rounded-full"
+                      width={70} // Set width to avoid layout shift
+                      height={70} />
+                    <h1 className="text-black text-lg font-bold">{adminUsers[0]?.name}</h1>
                   </div>
                   <div className="grid grid-cols-2 w-full gap-5">
                     {/* Left Column */}
@@ -164,7 +182,7 @@ export default function FinalAdmitcard({ params, onClose }) {
                     </div>
                     {/* Right Column */}
                     <div className="flex flex-col gap-5">
-                      <h1 className="text-lg font-medium">School Name: <span className="text-black text-lg font-bold">{admitCardData?.school_name}</span></h1>
+                      <h1 className="text-lg font-medium">School Name: <span className="text-black text-lg font-bold">{adminUsers[0]?.name}</span></h1>
                       <h1 className="text-lg font-medium">Examination: <span className="text-black text-lg font-bold">{admitCardData?.examination}</span></h1>
                       <h1 className="text-lg font-medium">Class: <span className="text-black text-lg font-bold">{admitCardData?.studentID?.class}</span></h1>
                       <h1 className="text-lg font-medium">End Date: <span className="text-black text-lg font-bold">{admitCardData?.enddate ? format(new Date(admitCardData?.enddate), "yyyy-MM-dd") : "N/A"}</span></h1>
@@ -221,9 +239,11 @@ export default function FinalAdmitcard({ params, onClose }) {
               >
 
                 <div className="flex flex-row gap-20">
-                  <Image src={logo} alt="logo" />
+                  <Image src={adminUsers[0]?.picture} alt="Logo" className="h-[50px] w-[50px] rounded-full"
+                    width={70} // Set width to avoid layout shift
+                    height={70} />
                   <h1 className="text-black text-lg font-bold">
-                    Soft Webtechs Solutions
+                    {adminUsers[0]?.name}
                   </h1>
                 </div>
                 <div className="grid grid-cols-2 w-full gap-5">

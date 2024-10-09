@@ -94,10 +94,10 @@ export default function CourseTable({ filter, searchTerm }) {
                   }`}
               >
                 <td className="py-4 px-6 text-left">{index + 1}</td>
-                <td className="py-4 px-6 text-left text-blue-600 underline">
-                  <Link href={`/AdminDashboard/LiveClassScreen/CourseName/${item._id}`}>
-                    {item.courseName}
-                  </Link>
+                <td className="py-4 px-6 text-left">
+
+                  {item.courseName}
+
                 </td>
                 <td className="py-4 px-6 text-left">{item.courseCode}</td>
                 <td className="py-4 px-6 text-left">{item.primaryInstructorname}</td>

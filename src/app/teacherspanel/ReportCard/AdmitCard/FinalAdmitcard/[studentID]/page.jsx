@@ -4,8 +4,9 @@ import React, { useState, useEffect, useRef } from "react";
 import { RxCrossCircled } from "react-icons/rx";
 import Image from "next/image";
 import logo from "../../logo.png";
-import { fetchAdmitCardByStudentID, fetchReportCardByStudentID, deleteAdmitCardData } from "../../../../../../../api/reportcardapi";
-import { format } from "date-fns"; // api to fetch admitcard using student Id anf fetch report card using student ID and delete using student ID 
+import { fetchAdmitCardByStudentID, fetchReportCardByStudentID, deleteAdmitCardData } from "../../../../../../../api/reportcardapi";// api to fetch admitcard using student Id and fetch report card using student ID and delete admitCard 
+import { fetchAdminUser } from "../../../../../../../api/adminUser";// use to fetch Admin details
+import { format } from "date-fns";
 import Link from "next/link";
 import { FaArrowLeftLong } from "react-icons/fa6";
 
@@ -14,6 +15,7 @@ export default function FinalAdmitcard({ params, onClose }) {
   const { studentID } = params; // StudentID
   const [admitCardData, setAdmitCardData] = useState(null);
   const [reportCardData, setReportCardData] = useState(null); // For report card data
+  const [adminUsers, setAdminUsers] = useState([]); // State for admin users
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [loadingReport, setLoadingReport] = useState(false); // To manage report card loading
@@ -83,6 +85,22 @@ export default function FinalAdmitcard({ params, onClose }) {
       });
   };
 
+
+  // Fetch admin users in a separate useEffect
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const adminUsers = await fetchAdminUser();
+        console.log(adminUsers); // Fetch admin users
+        setAdminUsers(adminUsers); // Store fetched admin users
+      } catch (error) {
+        console.error('Error fetching admin users:', error);
+      }
+    };
+
+    fetchUsers(); // Call the fetch function
+  }, []); // Empty dependency array means it runs only once when the component mounts
+
   // use to delete Admit card data 
   const handleDeleteAdmitCard = () => {
     if (!admitCardData?._id) return;
@@ -149,8 +167,10 @@ export default function FinalAdmitcard({ params, onClose }) {
                   {/* Admit Card Info */}
 
                   <div className="flex flex-row gap-20">
-                    <Image src={logo} alt="Logo" />
-                    <h1 className="text-black text-lg font-bold">Soft Webtechs Solutions</h1>
+                    <Image src={adminUsers[0]?.picture} alt="Logo" className="h-[50px] w-[50px] rounded-full"
+                      width={70} // Set width to avoid layout shift
+                      height={70} />
+                    <h1 className="text-black text-lg font-bold">{adminUsers[0]?.name}</h1>
                   </div>
                   <div className="grid grid-cols-2 w-full gap-5">
                     {/* Left Column */}
@@ -220,9 +240,11 @@ export default function FinalAdmitcard({ params, onClose }) {
               >
 
                 <div className="flex flex-row gap-20">
-                  <Image src={logo} alt="logo" />
+                  <Image src={adminUsers[0]?.picture} alt="Logo" className="h-[50px] w-[50px] rounded-full"
+                    width={70} // Set width to avoid layout shift
+                    height={70} />
                   <h1 className="text-black text-lg font-bold">
-                    Soft Webtechs Solutions
+                    {adminUsers[0]?.name}
                   </h1>
                 </div>
                 <div className="grid grid-cols-2 w-full gap-5">

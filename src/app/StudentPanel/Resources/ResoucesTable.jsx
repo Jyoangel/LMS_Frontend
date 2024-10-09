@@ -63,9 +63,9 @@ export default function ResourcesTable({ filter, searchTerm }) {
               >
                 <td className="py-4 px-6 text-left">{index + 1}</td>
                 <td className="py-4 px-6 text-left text-blue-500 underline">
-                  <Link href={"/StudentPanel/Assignment/AssignmentDetails"}>
+                 
                     {item.title}
-                  </Link>
+                 
                 </td>
                 <td className="py-4 px-6 text-left">{item.description}</td>
                 <td className="py-4 px-6 text-left">{item.type}</td>

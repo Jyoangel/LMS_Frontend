@@ -61,10 +61,10 @@ export default function HomeworkTable({ filter, searchTerm }) {
                   }`}
               >
                 <td className="py-4 px-6 text-left">{index + 1}</td>
-                <td className="py-4 px-6 text-left text-blue-500 underline">
-                  <Link href={"/StudentPanel/Homework/AddHomework"}>
-                    {item.homework}
-                  </Link>
+                <td className="py-4 px-6 text-left ">
+
+                  {item.homework}
+
                 </td>
                 <td className="py-4 px-6 text-left">{item.subjects}</td>
                 <td className="py-4 px-6 text-left">{item.chapter}</td>

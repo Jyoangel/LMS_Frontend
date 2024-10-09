@@ -60,9 +60,9 @@ export default function ExamTable({ filter, searchTerm }) {
               >
                 <td className="py-4 px-6 text-left">{index + 1}</td>
                 <td className="py-4 px-6 text-left ">
-                  <Link href={"/AdminDashboard/LiveClassScreen/CourseName"}>
-                    {item.examTitle}
-                  </Link>
+
+                  {item.examTitle}
+
                 </td>
                 <td className="py-4 px-6 text-left ">{item.subject}</td>
 

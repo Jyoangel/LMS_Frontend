@@ -21,13 +21,43 @@ const AddDetails = () => {
     const [isSelectOpen, setIsSelectOpen] = useState(false); // State to control the success message display
     const [successMessage, setSuccessMessage] = useState(''); // Holds the success or error message
 
+
+
     // Handle form input changes and update state
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: value,   // Update the specific form field with its new value
-        }));
+
+        // Update formData state
+        setFormData((prevData) => {
+            const updatedData = {
+                ...prevData,
+                [name]: value, // Update the specific form field with its new value
+            };
+
+            // Calculate the duration if startTime and endTime are available
+            if (name === 'startTime' || name === 'endTime') {
+                const { startTime, endTime } = updatedData;
+
+                if (startTime && endTime) {
+                    const start = new Date(`1970-01-01T${startTime}:00`);
+                    const end = new Date(`1970-01-01T${endTime}:00`);
+
+                    if (end > start) {
+                        const diffMs = end - start; // Difference in milliseconds
+                        const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+                        const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+
+                        updatedData.duration = `${diffHours}h ${diffMinutes}m`;
+                    } else {
+                        updatedData.duration = '';
+                    }
+                } else {
+                    updatedData.duration = '';
+                }
+            }
+
+            return updatedData;
+        });
     };
 
     // Handle form submission and validation
@@ -158,8 +188,7 @@ const AddDetails = () => {
                                 type="text"
                                 name="duration"
                                 value={formData.duration}
-                                onChange={handleChange}
-                                placeholder="Type here"
+                                readOnly
                                 className="border border-gray-300 rounded-md w-full py-3 px-5 outline-none"
                                 aria-label="Duration" // Accessibility label
                             />

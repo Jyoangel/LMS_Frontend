@@ -1,5 +1,78 @@
 "use client";
 
+
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { useUser } from "@auth0/nextjs-auth0/client"; // Import useUser hook from Auth0
+import { fetchStudentByEmail } from "../../../../api/api"; // Assume you have an API to fetch student data by email
+
+export default function ReportCardTable({ filter, searchTerm }) {
+  const { user, isLoading } = useUser(); // Get user data from Auth0
+  const [data, setData] = useState([]);
+
+  // Fetch student data by email
+  useEffect(() => {
+    async function fetchData() {
+      if (user && user.email) {
+        try {
+          const studentData = await fetchStudentByEmail(user.email);
+          if (studentData) {
+            setData([studentData]); // Set the data as an array since we are fetching a single student
+          }
+        } catch (error) {
+          console.error("Failed to fetch data:", error);
+        }
+      }
+    }
+
+    if (!isLoading) {
+      fetchData();
+    }
+  }, [user, isLoading]);
+
+  const filteredData = data.filter(
+    (item) =>
+      (filter === "" || item.class === filter) &&
+      (searchTerm === "" || item.name.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
+
+  return (
+    <>
+      <div className="w-full">
+        <table className="w-full bg-white">
+          <thead className="bg-blue-200 h-14 py-10">
+            <tr className="text-gray-700 text-sm font-normal leading-normal">
+              <th className="py-4 px-6 text-left">Sr. No</th>
+              <th className="py-4 px-6 text-left">Student Name</th>
+              <th className="py-4 px-6 text-left">Class</th>
+              <th className="py-4 px-6 text-left">Admission Number</th>
+            </tr>
+          </thead>
+          <tbody className="text-gray-600 text-sm font-light">
+            {filteredData.map((item, index) => (
+              <tr
+                key={index}
+                className={`text-gray-700 text-sm font-normal leading-normal ${index % 2 === 0 ? "bg-gray-100" : "bg-white"
+                  }`}
+              >
+                <td className="py-4 px-6 text-left">{index + 1}</td>
+                <td className="py-4 px-6 text-left text-blue-600 underline">
+                  <Link href={`/StudentPanel/ReportCard/FinalAdmitcard/${item._id}`}>
+                    {item.name}
+                  </Link>
+                </td>
+                <td className="py-4 px-6 text-left">{item.class}</td>
+                <td className="py-4 px-6 text-left">{item.admissionNumber}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
+  );
+}
+
+{/*
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { fetchStudentByID } from "../../../../api/api"; // api to fetch student data 
@@ -44,7 +117,7 @@ export default function ReportCardTable({ filter, searchTerm }) {
             </tr>
           </thead>
           <tbody className="text-gray-600 text-sm font-light">
-            {/* .map() function iterates through filteredData and renders a <tr> (table row) for each student   data*/}
+            {/* .map() function iterates through filteredData and renders a <tr> (table row) for each student   data*
             {filteredData.map((item, index) => (
               <tr
                 key={index}

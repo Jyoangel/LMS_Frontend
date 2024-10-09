@@ -117,16 +117,25 @@ export default function AddFees({ params }) {
                             <label
                                 htmlFor="feeMonth"
                                 className="text-lg font-normal text-black">Fee Month *</label>
-                            <input
+                            <select
                                 id="feeMonth"
-                                type="text"
                                 name="feeMonth"
-                                placeholder="Enter fee month"
                                 value={feeData.feeMonth}
                                 onChange={handleChange}
                                 className="border border-gray-300 rounded-md w-full py-3 px-5 outline-none"
-                            />
+                            >
+                                <option value="" disabled>Select a month</option>
+                                {[
+                                    'January', 'February', 'March', 'April', 'May', 'June',
+                                    'July', 'August', 'September', 'October', 'November', 'December'
+                                ].map((month) => (
+                                    <option key={month} value={month}>
+                                        {month}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
+
 
                         {/*  Fee Paid */}
                         <div className="flex flex-col gap-2 w-full">

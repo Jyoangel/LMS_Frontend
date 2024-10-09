@@ -26,7 +26,9 @@ export async function GET(req) {
             return NextResponse.redirect(`${req.nextUrl.origin}/StudentPanel`);
         }
         else {
-            return NextResponse.redirect('/');
+            //return NextResponse.redirect('/');
+            return NextResponse.redirect(`${req.nextUrl.origin}/`);
+
         }
     } catch (error) {
         console.error("Error during post-login redirection:", error);

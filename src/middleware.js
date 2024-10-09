@@ -1,3 +1,17 @@
+import { NextResponse } from "next/server";
+
+// Define a simple middleware function
+export function middleware(req) {
+    // Allow all requests to continue
+    return NextResponse.next();
+}
+
+// Apply middleware to all routes
+export const config = {
+    matcher: ["/:path*"], // Apply to all routes (you can customize this)
+};
+
+
 // import { NextResponse } from 'next/server';
 // import { getSession } from '@auth0/nextjs-auth0';
 
@@ -20,25 +34,28 @@
 //     matcher: ['/protected/(.*)', "/StudentPanel/:path*"],
 // };
 // middleware.js
-import { NextResponse } from "next/server";
-import { getSession } from "@auth0/nextjs-auth0";
 
-export async function middleware(req) {
-    const session = await getSession(req, res);
 
-    if (!session || !session.user) {
-        // Redirect the user to the login page if they are not authenticated
-        return NextResponse.redirect(new URL('/api/auth/login', req.url));
-    }
+// import { NextResponse } from "next/server";
+// import { getSession } from "@auth0/nextjs-auth0";
 
-    return NextResponse.next(); // Continue to the requested page if authenticated
-}
+// export async function middleware(req) {
+//     const session = await getSession(req, res);
 
-// Apply middleware to all routes
-export const config = {
-    matcher: ["/profile/:path*"], // Adjust this to the routes you want to protect
-};
+//     if (!session || !session.user) {
+//         // Redirect the user to the login page if they are not authenticated
+//         return NextResponse.redirect(new URL('/api/auth/login', req.url));
+//     }
 
+//     return NextResponse.next(); // Continue to the requested page if authenticated
+// }
+
+// // Apply middleware to all routes
+// export const config = {
+//     matcher: ["/profile/:path*"], // Adjust this to the routes you want to protect
+// };
+
+//https://66f5039ebd063a000831ba30--coruscating-sunshine-25faaf.netlify.app/
 {/*
 
 import { NextResponse } from 'next/server';
