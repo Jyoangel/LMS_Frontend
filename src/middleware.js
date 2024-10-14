@@ -14,7 +14,6 @@ export const config = {
 };
 
 
-
 // import { NextResponse } from 'next/server';
 // import { getSession } from '@auth0/nextjs-auth0';
 
@@ -56,6 +55,15 @@ export const config = {
 //     matcher: ["/profile/:path*"], // Adjust this to the routes you want to protect
 // };
 
+//     return NextResponse.next(); // Continue to the requested page if authenticated
+// }
+
+// // Apply middleware to all routes
+// export const config = {
+//     matcher: ["/profile/:path*"], // Adjust this to the routes you want to protect
+// };
+
+//https://66f5039ebd063a000831ba30--coruscating-sunshine-25faaf.netlify.app/
 {/*
 
 import { NextResponse } from 'next/server';

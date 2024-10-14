@@ -28,6 +28,8 @@ export default function TranspotationTable({ filter, searchTerm }) {
                 ...student,
                 pickupLocation: transportation.pickupLocation || "N/A",
                 dropLocation: transportation.dropLocation || "N/A",
+                pickupTime: transportation.pickupTime || "N/A",
+                dropTime: transportation.dropTime || "N/A",
               };
             } catch (err) {
               console.error(`Failed to fetch transportation for student ${student._id}`, err);
@@ -35,6 +37,8 @@ export default function TranspotationTable({ filter, searchTerm }) {
                 ...student,
                 pickupLocation: "N/A",
                 dropLocation: "N/A",
+                pickupTime: "N/A",
+                dropTime: "N/A",
               };
             }
           })
@@ -100,6 +104,8 @@ export default function TranspotationTable({ filter, searchTerm }) {
               <th className="py-4 px-6 text-left">Father Contact Number</th>
               <th className="py-4 px-6 text-left">Pickup Location</th>
               <th className="py-4 px-6 text-left">Drop Location</th>
+              <th className="py-4 px-6 text-left">Pickup Time</th>
+              <th className="py-4 px-6 text-left">Drop Time</th>
               <th className="py-4 px-6 text-left">Action</th>
             </tr>
           </thead>
@@ -123,8 +129,10 @@ export default function TranspotationTable({ filter, searchTerm }) {
                 <td className="py-4 px-6 text-left">{item.parent.fatherContactNumber}</td>
                 <td className="py-4 px-6 text-left">{item.pickupLocation}</td>
                 <td className="py-4 px-6 text-left">{item.dropLocation}</td>
+                <td className="py-4 px-6 text-left">{item.pickupTime}</td>
+                <td className="py-4 px-6 text-left">{item.dropTime}</td>
                 <td className="py-4 px-6 text-left flex gap-2">
-                  {item.pickupLocation === "N/A" && item.dropLocation === "N/A" ? (
+                  {item.pickupLocation === "N/A" && item.dropLocation === "N/A" && item.pickupTime === "N/A" && item.dropTime === "N/A" ? (
                     <Link href={`/AdminDashboard/Transpotation/AddTranspotation/${item._id}`}>
                       <button className="text-blue-600">
                         Add

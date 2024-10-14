@@ -6,17 +6,31 @@ import Image from "next/image";
 import Successcard from "@/Components/Successcard";
 import logo from "../../../Component/logo.png";
 import { sendFeeNotice } from "../../../../../../../api/api"; // Adjust the path based on your project structure
-
+import { fetchAdminUser } from "../../../../../../../api/adminUser";
 export default function FeeNotice({ studentID, onClose }) {
   const [message, setMessage] = useState('');
   const [remark, setRemark] = useState('');
   const [dueAmount, setDueAmount] = useState('');
   const [months, setMonths] = useState('');
+  const [adminUsers, setAdminUsers] = useState([]); // State for admin users
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(null);
   const noticeRef = useRef();
 
+  // Fetch admin users in a separate useEffect
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const adminUsers = await fetchAdminUser();
+        console.log(adminUsers); // Fetch admin users
+        setAdminUsers(adminUsers); // Store fetched admin users
+      } catch (error) {
+        console.error('Error fetching admin users:', error);
+      }
+    };
 
+    fetchUsers(); // Call the fetch function
+  }, []); // Empty dependency array means it runs only once when the component mounts
   useEffect(() => {
     const handleOutsideClick = (event) => {
       if (noticeRef.current && !noticeRef.current.contains(event.target)) {
@@ -56,7 +70,7 @@ export default function FeeNotice({ studentID, onClose }) {
       <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center z-50 bg-gray-800 bg-opacity-50">
         <div
           ref={noticeRef}
-          className="h-[700px] w-[500px] border border-blue-500 bg-white rounded-lg flex flex-col gap-3 p-5"
+          className="h-[600px] w-[500px] border border-blue-500 bg-white rounded-lg flex flex-col gap-3 p-5"
         >
           <div className="flex flex-row items-center justify-between ">
             <h1 className="text-black text-sm font-semibold">Fees Notice</h1>
@@ -65,14 +79,15 @@ export default function FeeNotice({ studentID, onClose }) {
             </button>
           </div>
           <div className="flex flex-row gap-5 border-b border-gray-500 pb-5">
-            <Image src={logo} alt="School Logo" />
+            <Image src={adminUsers[0]?.picture} alt="Logo" className="h-[50px] w-[50px] rounded-full"
+              width={70} // Set width to avoid layout shift
+              height={70} />
             <div className="flex flex-col gap-1">
               <h1 className="text-black text-lg font-semibold uppercase">
-                Gyan Ganga Public School
+                {adminUsers[0]?.name}
               </h1>
               <p className="text-gray-400 uppercase text-sm leading-5 tracking-wider">
-                piprahiyan road bhagwati pur barauli gopalganj [ Bihar ] u-dise-
-                code - 10150408603, Affiliation No. - 330878
+                barauli gopalganj [ Bihar ]
               </p>
             </div>
           </div>

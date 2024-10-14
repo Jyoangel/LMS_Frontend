@@ -3,51 +3,61 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { fetchClassScheduleData } from "../../../../api/classScheduleapi"; // api to fetch class schedule data 
+import { fetchClassScheduleByClass } from "../../../../api/classScheduleapi"; // Fetch API
 
 const Timetable = () => {
   const [scheduleData, setScheduleData] = useState([]);
   const [visibleCells, setVisibleCells] = useState({});
+  const [selectedClass, setSelectedClass] = useState(""); // State to store the selected class
 
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   const periods = [1, 2, 3, 4, 5, 6, 7, 8];
 
-  // call api to fetch class schedule data 
+  // Call API to fetch the class schedule data based on selected class
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await fetchClassScheduleData();
-        console.log("Fetched Schedule Data:", data); // Debugging log
-        setScheduleData(data);
-      } catch (error) {
-        console.error("Failed to fetch class schedule data:", error);
-      }
-    };
-    fetchData();
-  }, []);
+    if (selectedClass) {
+      const fetchData = async () => {
+        try {
+          const data = await fetchClassScheduleByClass(selectedClass);
+          console.log("Fetched Schedule Data:", data); // Debugging log
+          setScheduleData(data);
+        } catch (error) {
+          console.error("Failed to fetch class schedule data:", error);
+        }
+      };
+      fetchData();
+    }
+  }, [selectedClass]);
 
   const handleCellClick = (day, period) => {
-    setVisibleCells(prevState => ({
+    setVisibleCells((prevState) => ({
       ...prevState,
-      [`${day}-${period}`]: !prevState[`${day}-${period}`]
+      [`${day}-${period}`]: !prevState[`${day}-${period}`],
     }));
   };
 
   const renderCell = (day, period) => {
-    const entry = scheduleData.find(item => item.day === day && item.period.toString() === period.toString());
-    //console.log(`Rendering cell for ${day}, Period ${period}:`, entry); // Debugging log
+    const entry = scheduleData.find(
+      (item) => item.day === day && item.period.toString() === period.toString()
+    );
 
     if (entry) {
       return (
         <>
-          <Link href={`/AdminDashboard/ClassSchedule/EditClass/${entry._id}`}><div className="text-blue-600">{entry.subject}</div></Link>
-          <div>{entry.startTime} - {entry.endTime}</div>
+          <Link href={`/teacherspanel/ClassSchedule/EditClass/${entry._id}`}>
+            <div className="text-blue-600">{entry.subject}</div>
+          </Link>
+          <div>
+            {entry.startTime} - {entry.endTime}
+          </div>
         </>
       );
     } else if (visibleCells[`${day}-${period}`]) {
       return (
-        <Link href={`/AdminDashboard/ClassSchedule/CreateTimetable/${day}${period}`}>
-          <button className="bg-blue-500 text-white px-3 py-1 rounded" role="button">Create</button>
+        <Link href={`/teacherspanel/ClassSchedule/CreateTimetable/${day}${period}`}>
+          <button className="bg-blue-500 text-white px-3 py-1 rounded" role="button">
+            Create
+          </button>
         </Link>
       );
     } else {
@@ -57,21 +67,44 @@ const Timetable = () => {
 
   return (
     <div className="container mx-auto p-4">
+      {/* Class Filter */}
+      <div className="mb-4">
+        <label htmlFor="classFilter" className="mr-2 text-lg font-semibold">
+          Select Class:
+        </label>
+        <select
+          id="classFilter"
+          value={selectedClass}
+          onChange={(e) => setSelectedClass(e.target.value)}
+          className="p-2 border border-gray-300 rounded"
+        >
+          <option value="">-- Select Class --</option>
+          {[...Array(10)].map((_, index) => (
+            <option key={index + 1} value={index + 1}>{index + 1}</option>
+          ))}
+          {/* Add more classes as needed */}
+        </select>
+      </div>
+
       <div className="overflow-x-auto">
         <table className="min-w-full border-collapse border-2 border-gray-100">
           <thead>
             <tr className="bg-blue-200">
               <th className="border-2 border-gray-100 px-4 py-2">#</th>
-              {days.map(day => (
-                <th key={day} className="border-2 border-gray-100 px-4 py-2">{day}</th>
+              {/* Iterating over the 'days' array to dynamically create table headers for each day */}
+              {days.map((day) => (
+                <th key={day} className="border-2 border-gray-100 px-4 py-2">
+                  {day}
+                </th>
               ))}
             </tr>
           </thead>
           <tbody>
-            {periods.map(period => (
+            {/* Iterating over the 'periods' array to dynamically create table headers for each period */}
+            {periods.map((period) => (
               <tr key={period}>
                 <td className="border-2 bg-blue-200 border-gray-100 px-4 h-28">{period}</td>
-                {days.map(day => (
+                {days.map((day) => (
                   <td
                     key={day}
                     className="border border-gray-300 px-4 py-2 cursor-pointer"

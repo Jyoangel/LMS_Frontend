@@ -13,6 +13,7 @@ export default function EditClass({ params }) {
   const router = useRouter();
   const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [classSchedule, setClassSchedule] = useState({
+    class: '',
     subject: '',
     startTime: '',
     endTime: ''
@@ -32,6 +33,7 @@ export default function EditClass({ params }) {
       try {
         const data = await fetchClassScheduleById(id);
         setClassSchedule({
+          class: data?.class || '',
           subject: data?.subject || '',
           startTime: data?.startTime || '',
           endTime: data?.endTime || ''
@@ -58,16 +60,12 @@ export default function EditClass({ params }) {
   const handleUpdate = async (e) => {
     e.preventDefault();
     // Basic validation for required fields
-    if (!subject || !startTime || !endTime || !day || !period) {
+    if (!subject || !startTime || !endTime) {
       alert("Please fill out all required fields.");
       return; // Stop form submission if validation fails
     }
 
-    // Check if start time is before end time
-    if (startTime >= endTime) {
-      alert("Start time must be earlier than end time.");
-      return;
-    }
+
     try {
       await updateClassScheduleData(id, classSchedule);
       openModal(); // Show success modal
@@ -106,6 +104,28 @@ export default function EditClass({ params }) {
         <form onSubmit={handleUpdate} className="flex flex-col gap-10" role="form">
           <div className="w-full grid grid-cols-3 items-center gap-8">
             <div className="flex flex-col gap-2 w-full">
+              <label htmlFor="class" className="text-lg font-normal text-black">
+                Class *
+              </label>
+              <select
+                id="class"
+                type="text"
+                value={classSchedule.class}
+                onChange={handleInputChange}
+                placeholder="Enter class"
+                className="border border-gray-300 rounded-md w-full py-3 px-5 outline-none"
+              >
+                <option value="" className="text-gray-400">
+                  Select
+                </option>
+                {[...Array(10)].map((_, index) => (
+                  <option key={index + 1} value={index + 1}>{index + 1}</option>
+                ))}
+              </select>
+            </div>
+            <div className="flex flex-col gap-2 w-full">
+
+
               <label htmlFor="subject" className="text-lg font-normal text-black">
                 Subject *
               </label>

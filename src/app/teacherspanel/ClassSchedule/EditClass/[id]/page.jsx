@@ -4,13 +4,16 @@
 import Successcard from "@/Components/Successcard";
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { FaArrowLeftLong } from "react-icons/fa6";
-import { fetchClassScheduleById, updateClassScheduleData, deleteClassScheduleData } from "../../../../../../api/classScheduleapi";//  api to fetch ,update , delete specific calss schedule data 
+import { fetchClassScheduleById, updateClassScheduleData, deleteClassScheduleData } from "../../../../../../api/classScheduleapi"; // api to fetch using id , update and delete calss schedule 
 
 export default function EditClass({ params }) {
   const { id } = params;
+  const router = useRouter();
   const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [classSchedule, setClassSchedule] = useState({
+    class: '',
     subject: '',
     startTime: '',
     endTime: ''
@@ -24,12 +27,13 @@ export default function EditClass({ params }) {
     setIsSelectOpen(false);
   };
 
-  // use to fetch intial class schedule data 
+  // fetch intial data in form 
   const fetchInitialData = async () => {
     if (id) {
       try {
         const data = await fetchClassScheduleById(id);
         setClassSchedule({
+          class: data?.class || '',
           subject: data?.subject || '',
           startTime: data?.startTime || '',
           endTime: data?.endTime || ''
@@ -52,9 +56,16 @@ export default function EditClass({ params }) {
     }));
   };
 
-  // use to update class schedule data 
+  // use to update data 
   const handleUpdate = async (e) => {
     e.preventDefault();
+    // Basic validation for required fields
+    if (!subject || !startTime || !endTime) {
+      alert("Please fill out all required fields.");
+      return; // Stop form submission if validation fails
+    }
+
+
     try {
       await updateClassScheduleData(id, classSchedule);
       openModal(); // Show success modal
@@ -63,7 +74,7 @@ export default function EditClass({ params }) {
     }
   };
 
-  // use to delete class schedule data 
+  // use to delete the class schedule  data 
   const handleDelete = async () => {
     try {
       await deleteClassScheduleData(id);
@@ -76,6 +87,7 @@ export default function EditClass({ params }) {
   return (
     <>
       <div className="h-screen w-full flex flex-col p-5 gap-10">
+        {/* Back button to navigate to the previous page */}
         <div className="w-full flex flex-row justify-between">
           <Link href={"/teacherspanel/ClassSchedule"}>
             <button className="flex items-center justify-center gap-2">
@@ -92,6 +104,28 @@ export default function EditClass({ params }) {
         <form onSubmit={handleUpdate} className="flex flex-col gap-10" role="form">
           <div className="w-full grid grid-cols-3 items-center gap-8">
             <div className="flex flex-col gap-2 w-full">
+              <label htmlFor="class" className="text-lg font-normal text-black">
+                Class *
+              </label>
+              <select
+                id="class"
+                type="text"
+                value={classSchedule.class}
+                onChange={handleInputChange}
+                placeholder="Enter class"
+                className="border border-gray-300 rounded-md w-full py-3 px-5 outline-none"
+              >
+                <option value="" className="text-gray-400">
+                  Select
+                </option>
+                {[...Array(10)].map((_, index) => (
+                  <option key={index + 1} value={index + 1}>{index + 1}</option>
+                ))}
+              </select>
+            </div>
+            <div className="flex flex-col gap-2 w-full">
+
+
               <label htmlFor="subject" className="text-lg font-normal text-black">
                 Subject *
               </label>

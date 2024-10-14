@@ -100,6 +100,20 @@ export async function deleteStudentData(id) {
     }
 }
 
+//fetch studentby email
+export async function fetchStudentByEmail(email) {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/student/email/${email}`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch student data');
+        }
+        const studentData = await response.json();
+        return studentData;
+    } catch (error) {
+        console.error('Error fetching student by email:', error);
+        throw error;
+    }
+}
 
 // import Student data
 

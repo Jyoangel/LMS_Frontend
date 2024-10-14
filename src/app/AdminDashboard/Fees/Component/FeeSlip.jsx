@@ -7,9 +7,11 @@ import Image from "next/image";
 import logo from "./logo.png";
 import { fetchFeeRecordById } from "../../../../../api/api"; // api to fetch fee 
 import { format } from "date-fns";
+import { useUser } from '@auth0/nextjs-auth0/client';
 
 export default function FeeSlip({ onClose, feeId }) {
   const [feeDetails, setFeeDetails] = useState(null);
+  const { user, isLoading } = useUser();
 
   // use to fetch fee data 
   useEffect(() => {
@@ -60,14 +62,27 @@ export default function FeeSlip({ onClose, feeId }) {
             </button>
           </div>
           <div className="flex flex-row gap-5  pb-5" data-testid="feeslip-notice-area">
-            <Image src={logo} alt="img" className="h-[80px] w-[80px]" />
+            {/* <Image src={logo} alt="img" className="h-[80px] w-[80px]" /> */}
+            {/* Display user picture and name if authenticated */}
+            {!isLoading && user && (
+
+              <Image
+                src={user.picture} // User profile picture
+                alt={user.name} // User name
+                className="h-[50px] w-[50px] rounded-full"
+                width={50} // Set width to avoid layout shift
+                height={50} // Set height to avoid layout shift
+              />
+
+
+            )}
             <div className="flex flex-col gap-3">
               <div className="flex flex-col gap-1">
                 <h1 className="text-black text-lg font-semibold uppercase">
-                  Gyan Ganga Public School
+                  {user.name}
                 </h1>
                 <p className=" text-gray-400 font-semibold">
-                  Piprahyan Road Bhagwatipur, Barauli, Gopal Ganj, (Bihar){" "}
+                  Barauli, Gopal Ganj, (Bihar){" "}
                 </p>
                 <p className="text-sm text-black font-semibold">
                   Registration No- {feeDetails.studentID?.admissionNumber}
@@ -150,44 +165,50 @@ export default function FeeSlip({ onClose, feeId }) {
             <div className="h-[30px] w-full bg-white flex flex-row items-center justify-between px-5">
               <h1 className="text-sm text-black font-semibold">Monthly Fee</h1>
               <h1 className="text-sm text-black font-semibold">
-                {feeDetails.studentID?.monthlyFee}
+                Rs {feeDetails.studentID?.monthlyFee}
+              </h1>
+            </div>
+            <div className="h-[30px] w-full bg-white flex flex-row items-center justify-between px-5">
+              <h1 className="text-sm text-black font-semibold">Extra Fee</h1>
+              <h1 className="text-sm text-black font-semibold">
+                Rs {feeDetails.extraFee}
               </h1>
             </div>
             <div className="h-[30px] w-full bg-white flex flex-row items-center justify-between px-5">
               <h1 className="text-sm text-black font-semibold"> Fee Paid</h1>
               <h1 className="text-sm text-black font-semibold">
-                {feeDetails.feePaid}
+                Rs {feeDetails.feePaid}
               </h1>
             </div>
             <div className="h-[30px] w-full bg-white flex flex-row items-center justify-between px-5">
               <h1 className="text-sm text-black font-semibold">Other Fee</h1>
               <h1 className="text-sm text-black font-semibold">
-                {feeDetails.otherFee}
+                Rs {feeDetails.otherFee}
               </h1>
             </div>
             <div className="h-[30px] w-full bg-gray-200 flex flex-row items-center justify-between px-5">
               <h1 className="text-sm text-black font-semibold">
-                Total : {feeDetails.total}
+                Total :  Rs {feeDetails.total}
               </h1>
               <h1 className="text-sm text-black font-semibold">
-                Dues: {feeDetails.dueAmount}{" "}
+                Dues:  Rs {feeDetails.dueAmount}{" "}
               </h1>
               <h1 className="text-sm text-black font-semibold">
-                Total: {feeDetails.total}
+                Total:  Rs {feeDetails.total}
               </h1>
             </div>
             <div className="h-[30px] w-full bg-white flex flex-row items-center justify-between px-5">
               <h1 className="text-sm text-black font-semibold">
-                Paid : {feeDetails.paidAmount}
+                Paid :  Rs {feeDetails.paidAmount}
               </h1>
               <h1 className="text-sm text-black font-semibold">
-                Balance: {feeDetails.totalDues}
+                Balance:  Rs {feeDetails.totalDues}
               </h1>
             </div>
 
             <div className="h-[30px] w-full bg-white flex flex-row items-center justify-between px-5">
               <h1 className="text-sm text-black  font-semibold">
-                Amount in word ({feeDetails.amountInWords})
+                Amount in word  Rs ({feeDetails.amountInWords})
               </h1>
             </div>
             <div className="h-[30px] w-full bg-white flex flex-row items-center justify-between px-5">

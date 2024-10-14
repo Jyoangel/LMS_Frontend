@@ -1,10 +1,9 @@
 "use client";
-
 import Successcard from "@/Components/Successcard";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { FaArrowLeftLong } from "react-icons/fa6";
-import { addClassScheduleData } from "../../../../../../api/classScheduleapi"; // api to add class schedule data 
+import { addClassScheduleData } from "../../../../../../api/classScheduleapi"; // API to add calendar
 
 export default function CreateTimetable({ params }) {
   const { dayperiod } = params;
@@ -14,6 +13,7 @@ export default function CreateTimetable({ params }) {
   const [endTime, setEndTime] = useState("");
   const [day, setDay] = useState("");
   const [period, setPeriod] = useState("");
+  const [classValue, setClass] = useState("");
 
   useEffect(() => {
     if (dayperiod) {
@@ -24,13 +24,12 @@ export default function CreateTimetable({ params }) {
     }
   }, [dayperiod]);
 
-
-  // api to call add class schedule data 
+  // Submit class schedule and call add class schedule
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     // Basic validation for required fields
-    if (!subject || !startTime || !endTime || !day || !period) {
+    if (!classValue || !subject || !startTime || !endTime || !day || !period) {
       alert("Please fill out all required fields.");
       return; // Stop form submission if validation fails
     }
@@ -41,18 +40,13 @@ export default function CreateTimetable({ params }) {
       return;
     }
 
-    // Check if the day and period values are valid (you can customize this based on your specific needs)
-    if (day.trim() === "" || period.trim() === "") {
-      alert("Please provide valid values for day and period.");
-      return;
-    }
-
     const classData = {
+      class: classValue,
       subject,
       startTime,
       endTime,
-      day: day.trim(), // Ensure values are trimmed
-      period: period.trim(),
+      day,
+      period,
     };
 
     try {
@@ -68,7 +62,7 @@ export default function CreateTimetable({ params }) {
     <>
       <div className="h-screen w-full flex flex-col p-5 gap-10">
         <div className="w-full flex flex-row justify-between">
-          <Link href={"/teachersPanel/ClassSchedule"}>
+          <Link href={"/teacherspanel/ClassSchedule"}>
             <button className="flex items-center justify-center gap-2">
               <FaArrowLeftLong className="h-10 w-10 bg-gray-100 rounded-full p-2" />
               <h1 className="text-lg font-semibold">Back</h1>
@@ -78,6 +72,27 @@ export default function CreateTimetable({ params }) {
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-10">
           <div className="w-full grid grid-cols-3 items-center gap-8">
+            <div className="flex flex-col gap-2 w-full">
+              <label htmlFor="class" className="text-lg font-normal text-black">
+                Class *
+              </label>
+              <select
+                id="class"
+                type="text"
+                value={classValue}
+                onChange={(e) => setClass(e.target.value)}
+                placeholder="Enter class"
+                className="border border-gray-300 rounded-md w-full py-3 px-5 outline-none"
+              >
+                <option value="" className="text-gray-400">
+                  Select
+                </option>
+                {[...Array(10)].map((_, index) => (
+                  <option key={index + 1} value={index + 1}>{index + 1}</option>
+                ))}
+              </select>
+            </div>
+
             <div className="flex flex-col gap-2 w-full">
               <label htmlFor="subject" className="text-lg font-normal text-black">Subject *</label>
               <input
@@ -121,7 +136,11 @@ export default function CreateTimetable({ params }) {
           </button>
 
           {isSelectOpen && (
-            <Successcard onClose={() => setIsSelectOpen(false)} para={"Time Table added successfully!"} url={"/teachersPanel/ClassSchedule"} />
+            <Successcard
+              onClose={() => setIsSelectOpen(false)}
+              para={"Time Table added successfully!"}
+              url={"/teacherspanel/ClassSchedule"}
+            />
           )}
         </form>
       </div>
