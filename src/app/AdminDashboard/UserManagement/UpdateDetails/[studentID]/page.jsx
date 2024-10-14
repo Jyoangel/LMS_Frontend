@@ -139,6 +139,7 @@ export default function UpdateDetails({ params }) {
                                 <input
                                     type="text"
                                     placeholder="Type here"
+                                    readOnly
                                     name="studentID"
                                     value={formData.studentID}
                                     onChange={handleChange}

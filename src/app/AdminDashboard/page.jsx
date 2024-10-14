@@ -1,3 +1,15 @@
+"use client"
+
+
+"use client";
+
+
+
+
+
+
+
+
 import Main from "./Main/Page";
 
 export default function AdminDashboard() {

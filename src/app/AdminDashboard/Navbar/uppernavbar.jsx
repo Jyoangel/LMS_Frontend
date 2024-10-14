@@ -20,13 +20,13 @@ export default function UpperNavbar() {
     if (user) {
       const fetchDetails = async () => {
         try {
-          const feeResponse = await fetch("http://localhost:5000/api/admin/create-database", {
+          const feeResponse = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/admin/create-database`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              dbName: user.nickname,  // Extract the email prefix as the dbName
+              dbName: user.sub,  // Extract the email prefix as the dbName
             }),
           });
 
