@@ -1,8 +1,6 @@
 "use client"
 
-"use client";
 
-"use client";
 
 import { Inter } from "next/font/google";
 import "../globals.css";
@@ -75,9 +73,9 @@ export default function RootLayout({ children }) {
       return;
     }
 
-    const userRoles = user["https://localhost:3000/roles"];
-    if (!userRoles || !userRoles.includes("Admin")) {
-      router.push("/"); // Redirect if not admin
+    const userRoles = user['https://chic-swan-0387d3.netlify.app/roles'];
+    if (!userRoles || !userRoles.includes('Admin')) {
+      router.push('/'); // Redirect if not admin
       return;
     }
 

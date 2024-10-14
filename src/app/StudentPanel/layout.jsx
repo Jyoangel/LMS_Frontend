@@ -25,7 +25,7 @@ export default function RootLayout({ children }) {
       return;
     }
 
-    const userRoles = user['https://localhost:3000/roles'];
+    const userRoles = user['https://chic-swan-0387d3.netlify.app/roles'];
     if (!userRoles || !userRoles.includes('Student')) {
       router.push('/'); // Redirect if not a student
       return;
