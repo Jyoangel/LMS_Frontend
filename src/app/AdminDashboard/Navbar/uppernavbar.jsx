@@ -16,35 +16,35 @@ export default function UpperNavbar() {
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>{error.message}</div>;
 
-  useEffect(() => {
-    if (user) {
-      const fetchDetails = async () => {
-        try {
-          const feeResponse = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/admin/create-database`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              dbName: user.sub,  // Extract the email prefix as the dbName
-            }),
-          });
+  // useEffect(() => {
+  //   if (user) {
+  //     const fetchDetails = async () => {
+  //       try {
+  //         const feeResponse = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/admin/create-database`, {
+  //           method: "POST",
+  //           headers: {
+  //             "Content-Type": "application/json",
+  //           },
+  //           body: JSON.stringify({
+  //             dbName: user.sub,  // Extract the email prefix as the dbName
+  //           }),
+  //         });
 
-          // Check if the response was successful
-          if (!feeResponse.ok) {
-            throw new Error('Failed to create database');
-          }
+  //         // Check if the response was successful
+  //         if (!feeResponse.ok) {
+  //           throw new Error('Failed to create database');
+  //         }
 
-          const data = await feeResponse.json();
-          console.log('Database created successfully:', data);
+  //         const data = await feeResponse.json();
+  //         console.log('Database created successfully:', data);
 
-        } catch (error) {
-          console.error("Error creating database:", error);
-        }
-      };
-      fetchDetails();
-    }
-  }, [user]);
+  //       } catch (error) {
+  //         console.error("Error creating database:", error);
+  //       }
+  //     };
+  //     fetchDetails();
+  //   }
+  // }, [user]);
   console.log('User:', user);
 
   const toggleDropdown = () => {
