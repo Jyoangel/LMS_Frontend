@@ -1,6 +1,9 @@
 // fetch Student data 
 export async function fetchStudentData() {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/get`);
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/get`, {
+        method: 'GET',
+        cache: 'no-store', // Prevent caching on client-side
+    });
 
     if (!res.ok) {
         throw new Error('Failed to fetch data');
@@ -8,6 +11,7 @@ export async function fetchStudentData() {
 
     return res.json();
 }
+
 
 
 
