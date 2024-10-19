@@ -4,9 +4,11 @@ import Link from "next/link";
 import { useState } from "react";
 import { FaArrowLeftLong } from "react-icons/fa6";
 import { addStudentData } from "../../../../../api/api"; // add student api 
+import { useUser } from '@auth0/nextjs-auth0/client';
 
 export default function StudentDetails() {
   const [isSelectOpen, setisSelectOpen] = useState(false);
+  const { user, error, isLoading } = useUser();
 
 
   const openModal = () => {
@@ -16,6 +18,9 @@ export default function StudentDetails() {
   const closeModal = () => {
     setisSelectOpen(false);
   };
+  if (isLoading) return <div>Loading...</div>; // Show loading state
+  if (error) return <div>{error.message}</div>; // Handle errors
+  
   const initialFormData = {
     studentID: '',
     formNumber: '',
@@ -36,6 +41,7 @@ export default function StudentDetails() {
     address: '',
     totalFee: "",
     session: "",
+    userId: user ? user.sub : '',
     parent: {
       fatherName: '',
       fatherContactNumber: '',
