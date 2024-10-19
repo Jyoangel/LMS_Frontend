@@ -1,46 +1,77 @@
-// fetch Student data 
-export async function fetchStudentData() {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/get`, {
-        method: 'GET',
-        cache: 'no-store', // Prevent caching on client-side
-    });
+export async function fetchStudentData(userId) {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/get?userId=${userId}`);
 
     if (!res.ok) {
-        throw new Error('Failed to fetch data');
+        throw new Error('Failed to fetch student data');
     }
 
     return res.json();
 }
 
 
-
-
-
-//add student data
 export async function addStudentData(studentData) {
-    try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/add`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(studentData),
-        });
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/add`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            ...studentData,
+            userId: encodeURIComponent(studentData.userId), // URL-encode the userId to handle special characters
+        }),
+    });
 
-        // Check if the server response is not OK (status code is not in the range of 200-299)
-        if (!res.ok) {
-            // Try to extract the error message from the response body
-            const errorData = await res.json();
-            // Throw an error with the message returned from the server
-            throw new Error(errorData.message || 'Failed to add student data');
-        }
-
-        return res.json(); // Parse and return the JSON data if the response is OK
-    } catch (error) {
-        // Catch any network or server errors and rethrow with a proper message
-        throw new Error(error.message || 'Something went wrong while adding student data');
+    if (!res.ok) {
+        throw new Error('Failed to add student');
     }
+
+    return res.json();
 }
+
+
+// fetch Student data 
+// export async function fetchStudentData() {
+//     const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/get`, {
+//         method: 'GET',
+//         cache: 'no-store', // Prevent caching on client-side
+//     });
+
+//     if (!res.ok) {
+//         throw new Error('Failed to fetch data');
+//     }
+
+//     return res.json();
+// }
+
+
+
+
+
+// //add student data
+// export async function addStudentData(studentData) {
+//     try {
+//         const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/add`, {
+//             method: 'POST',
+//             headers: {
+//                 'Content-Type': 'application/json',
+//             },
+//             body: JSON.stringify(studentData),
+//         });
+
+//         // Check if the server response is not OK (status code is not in the range of 200-299)
+//         if (!res.ok) {
+//             // Try to extract the error message from the response body
+//             const errorData = await res.json();
+//             // Throw an error with the message returned from the server
+//             throw new Error(errorData.message || 'Failed to add student data');
+//         }
+
+//         return res.json(); // Parse and return the JSON data if the response is OK
+//     } catch (error) {
+//         // Catch any network or server errors and rethrow with a proper message
+//         throw new Error(error.message || 'Something went wrong while adding student data');
+//     }
+// }
 
 
 //fetch studentdata by StudentID(string)
