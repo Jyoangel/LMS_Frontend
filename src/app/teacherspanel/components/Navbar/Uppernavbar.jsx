@@ -88,8 +88,6 @@ export default function UpperNavbar() {
     </div>
   );
 }
-<<<<<<< HEAD
-=======
 
 // Function to upload the image to Cloudinary and return the URL
 // Function to upload the image to Cloudinary and return the URL
@@ -190,4 +188,3 @@ async function fetchUpdatedUserProfile(userId) {
   const data = await response.json();
   return data; // Return the updated user data
 }
->>>>>>> Frontend

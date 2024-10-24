@@ -34,6 +34,8 @@ export async function addStudentData(studentData) {
         // Catch any network or server errors and rethrow with a proper message
         throw new Error(error.message || 'Something went wrong while adding student data');
     }
+
+    return res.json();
 }
 
 

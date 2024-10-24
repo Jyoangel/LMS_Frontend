@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { fetchStudentData, deleteStudentData } from "../../../../../api/api"; // fetch and delete api for student 
 import { format } from "date-fns";
 import { useUser } from '@auth0/nextjs-auth0/client'; // Import Auth0 client hook
+import { useUser } from '@auth0/nextjs-auth0/client'; // Import Auth0 client hook
 
 export default function UserManagementTable({ filter, searchTerm }) {
   const [data, setData] = useState({ students: [] });
@@ -42,6 +43,7 @@ export default function UserManagementTable({ filter, searchTerm }) {
     try {
       const data = await fetchStudentData(user.sub);
       console.log("data", data);
+
       setData(data);
       setLoading(false);
     } catch (error) {
