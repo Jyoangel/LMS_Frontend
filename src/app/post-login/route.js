@@ -14,11 +14,7 @@ export async function GET(req) {
 
         const user = session.user;
         console.log(user);
-<<<<<<< Updated upstream
         const roles = user['https://coruscating-sunshine-25faaf.netlify.app/roles']; // Replace with the correct claim for roles from your Auth0 settings
-=======
-        const roles = user['https://localhost:3000/roles']; // Replace with the correct claim for roles from your Auth0 settings
->>>>>>> Stashed changes
         console.log(roles);
 
         // Redirect based on the user's role
