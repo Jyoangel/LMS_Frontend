@@ -13,6 +13,7 @@ export default function CourseName({ params }) {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
   // use to fetch  cour se data 
   useEffect(() => {
     async function fetchData() {

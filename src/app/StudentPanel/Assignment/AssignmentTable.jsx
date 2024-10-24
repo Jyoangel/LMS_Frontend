@@ -5,17 +5,48 @@ import Link from "next/link";
 import { fetchAssignmentData, } from "../../../../api/assignmentapi";// api to fetch  all assignment 
 import { LiaFileDownloadSolid } from "react-icons/lia";
 import { format } from "date-fns";
+import { checkUserRole } from "../../../../api/api"; // Import checkUserRole function
+import { useUser } from '@auth0/nextjs-auth0/client';
 
 export default function AssignmentTable({ filter, searchTerm }) {
 
   const [assignmentData, setAssignmentData] = useState({ assignments: [] });
   const [isLoading, setLoading] = useState(true);
+  const [userId, setUserId] = useState(null);
+  const { user, error: authError, isLoading: userLoading } = useUser();
+  // Fetch  library data on component mount
+
+  // Check user role and retrieve userId
+  useEffect(() => {
+    if (!user) return;
+    async function getUserRole() {
+      const email = user?.email; // Ensure user email is available
+      if (!email) return; // Prevent unnecessary fetch
+
+      try {
+        const result = await checkUserRole(email); // Use the imported function
+
+        if (result.exists) {
+          setUserId(result.userId); // Set userId from the response
+        } else {
+          setError("User not found or does not exist.");
+        }
+      } catch (error) {
+        console.error("Error fetching user role:", error);
+        setError("Failed to fetch user role.");
+      }
+    }
+
+    getUserRole();
+  }, [user]);
+
 
   // call the api to fetch the assignment 
   useEffect(() => {
+    if (!userId) return;
     const fetchData = async () => {
       try {
-        const data = await fetchAssignmentData();
+        const data = await fetchAssignmentData(userId);
         setAssignmentData(data);
       } catch (error) {
         console.error('Error fetching assignment data:', error);
@@ -25,7 +56,7 @@ export default function AssignmentTable({ filter, searchTerm }) {
     };
 
     fetchData();
-  }, []);
+  }, [userId]);
 
 
 

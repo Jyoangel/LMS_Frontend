@@ -1,12 +1,15 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Successcard from "@/Components/Successcard";
 import Link from "next/link";
 import { FaArrowLeftLong } from "react-icons/fa6";
 import { addLibraryData } from "../../../../../api/libraryapi"; // add api for library
+import { useUser } from '@auth0/nextjs-auth0/client';
 
 export default function AddLibrary() {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
+  const { user, isLoading } = useUser();
+  const [userId, setUserId] = useState("");
   const [formData, setFormData] = useState({
     title: "",
     type: "",
@@ -16,7 +19,15 @@ export default function AddLibrary() {
     uploadedBy: "",
     description: "",
     uploadBookPdf: null, // Change to null to handle file upload
+
   });
+  // Set userId when user data is available
+  useEffect(() => {
+    if (user && user.sub) {
+      console.log("User ID:", user.sub); // Log user.sub to confirm it's a valid string
+      setUserId(user.sub); // Set userId directly
+    }
+  }, [user]);
   const [error, setError] = useState(""); // To display error messages
 
   const openModal = () => {
@@ -72,7 +83,7 @@ export default function AddLibrary() {
     data.append("authorName", formData.authorName);
     data.append("uploadedBy", formData.uploadedBy);
     data.append("description", formData.description);
-
+    data.append('userId', userId); // Ensure userId is
     // Check if uploadBookPdf is a valid file
     if (formData.uploadBookPdf instanceof File) {
       data.append("uploadBookPdf", formData.uploadBookPdf);

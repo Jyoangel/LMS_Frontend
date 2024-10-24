@@ -15,10 +15,11 @@ import AttendanceChart from './components/AttendanceChart';
 import { fetchCalendarData } from '../../../../api/calendarapi'; // api to fetch calendar data
 import { fetchHomeWorkData } from '../../../../api/homeworkapi'; // api to fetch homework  data
 import { fetchAssignmentData } from '../../../../api/assignmentapi'; // api to fetch assignment data
-import { fetchClassScheduleData } from '../../../../api/classScheduleapi'; // api to fetch ckass schdule data
+import { fetchClassScheduleByClass } from '../../../../api/classScheduleapi'; // api to fetch ckass schdule data
 import { fetchCourseData } from '../../../../api/courseapi'; // api to fetch course data 
 import { format } from "date-fns";
 import { getData } from "../../../../api/api";// api to fetch count of student and present student count also homework count
+import { checkUserRole } from "../../../../api/api"; // Import checkUserRole function
 
 
 export default function Dashboard() {
@@ -28,18 +29,47 @@ export default function Dashboard() {
   const [events, setEvents] = useState([]);
   const [homeworks, setHomeworks] = useState([]);
   const [assignments, setAssignments] = useState([]);
+  const [studentClass, setStudentClass] = useState(null);
   const [classSchedules, setClassSchedules] = useState([]);
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isError, setIsError] = useState(null);
   const [Error, setError] = useState(null); // Renamed to avoid confusion with user error
   const [attendanceData, setAttendanceData] = useState({});
+  const [userId, setUserId] = useState(null);
+  const [studentId, setStudentId] = useState(null);
 
+  // Check user role and retrieve userId
+  useEffect(() => {
+    if (!user) return; // Prevent unnecessary fetch if user data isn't available yet
+
+    async function getUserRole() {
+      const email = user?.email;
+      if (!email) return;
+
+      try {
+        const result = await checkUserRole(email); // Use the imported function
+        if (result.exists) {
+          setUserId(result.userId);
+          setStudentId(result.studentID)
+          setStudentClass(result.class); // Set userId from the response
+        } else {
+          setError("User not found or does not exist.");
+        }
+      } catch (error) {
+        console.error("Error fetching user role:", error);
+        setError("Failed to fetch user role.");
+      }
+    }
+
+    getUserRole();
+  }, [user]);
   // call count api 
   useEffect(() => {
+    if (!userId) return;
     async function fetchData() {
       try {
-        const data = await getData();
+        const data = await getData(userId);
         setData(data);
       } catch (err) {
         setError(err.message);
@@ -48,17 +78,18 @@ export default function Dashboard() {
       }
     }
     fetchData();
-  }, []);
+  }, [userId]);
 
   // call api to fetch attendnce
   useEffect(() => {
+    if (!studentId) return;
     async function fetchAttendance() {
       try {
         // Hardcoded studentId for demonstration
-        const studentId = '66cc0a5e9fae1990a3916b66'; // Replace with an actual studentId from your database
+        //const studentId = '66cc0a5e9fae1990a3916b66'; // Replace with an actual studentId from your database
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/attendance/student/${studentId}`);
         const data = await response.json();
-        console.log(data);
+
         setAttendanceData(data);
       } catch (err) {
         setError(err.message);
@@ -67,13 +98,14 @@ export default function Dashboard() {
       }
     }
     fetchAttendance();
-  }, []);
+  }, [studentId]);
 
   // call api to fetch course 
   useEffect(() => {
+    if (!userId) return;
     const getCourseData = async () => {
       try {
-        const data = await fetchCourseData();
+        const data = await fetchCourseData(userId);
         setCourses(data.courses);  // Assuming data is an array of course objects
       } catch (error) {
         console.error("Failed to fetch course data:", error);
@@ -81,7 +113,7 @@ export default function Dashboard() {
     };
 
     getCourseData();
-  }, []);
+  }, [userId]);
   const [studentData, setStudentData] = useState({
     loginUser: { name: 'My Performance', scores: [60, 70, 80, 90, 75, 85, 95] },
     top1: { name: 'Top One Student', scores: [65, 59, 80, 81, 56, 55, 40] },
@@ -105,9 +137,10 @@ export default function Dashboard() {
 
   //call api to fetch event from calendat of current month 
   useEffect(() => {
+    if (!userId) return;
     async function fetchEvents() {
       try {
-        const eventData = await fetchCalendarData();
+        const eventData = await fetchCalendarData(userId);
         const currentDate = new Date();
         const currentMonth = currentDate.getMonth();
         const currentYear = currentDate.getFullYear();
@@ -124,14 +157,15 @@ export default function Dashboard() {
       }
     }
     fetchEvents();
-  }, []);
+  }, [userId]);
 
 
   useEffect(() => {
+    if (!userId) return;
     // Fetch assignment data when the component mounts
     const fetchData = async () => {
       try {
-        const data = await fetchAssignmentData();
+        const data = await fetchAssignmentData(userId);
         setAssignments(data.assignments);
       } catch (err) {
         setError(err.message);
@@ -139,13 +173,15 @@ export default function Dashboard() {
     };
 
     fetchData();
-  }, []); //
+  }, [userId]); //
 
   useEffect(() => {
+    if (!studentClass || !userId) return;
     // Fetch class schedule  data when the component mounts
     const fetchData = async () => {
       try {
-        const data = await fetchClassScheduleData();
+        const data = await fetchClassScheduleByClass(studentClass, userId);
+        console.log("Datta", data);
         setClassSchedules(data);
       } catch (err) {
         setError(err.message);
@@ -153,13 +189,14 @@ export default function Dashboard() {
     };
 
     fetchData();
-  }, []);
+  }, [studentClass, userId]);
 
   // feetch homework data 
   useEffect(() => {
+    if (!userId) return;
     async function loadHomeworks() {
       try {
-        const data = await fetchHomeWorkData();
+        const data = await fetchHomeWorkData(userId);
         console.log(data);
         setHomeworks(data.homeworks || []);
       } catch (err) {
@@ -169,7 +206,7 @@ export default function Dashboard() {
       }
     }
     loadHomeworks();
-  }, []);
+  }, [userId]);
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>{error.message}</div>;

@@ -4,11 +4,14 @@ import { format } from "date-fns";
 import { fetchLibraryData, deletelibraryData } from "../../../../api/libraryapi";// fetch and delete api
 import ConfirmationCard from "@/Components/ConfirmationCard";
 import Link from "next/link";
+import { useUser } from '@auth0/nextjs-auth0/client';
 
 export default function LibraryTable({ filter, searchTerm }) {
   const [libraryData, setLibraryData] = useState([]);
   const [isDelete, setDelete] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
+  const { user, error, isLoading } = useUser();
+
 
   const openDelete = (id) => {
     setDeleteId(id);
@@ -34,7 +37,7 @@ export default function LibraryTable({ filter, searchTerm }) {
   useEffect(() => {
     async function fetchData() {
       try {
-        const data = await fetchLibraryData();
+        const data = await fetchLibraryData(user.sub);
         setLibraryData(data.libraryItems);
       } catch (error) {
         console.error('Failed to fetch library data:', error);

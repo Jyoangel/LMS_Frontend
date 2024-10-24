@@ -1,8 +1,8 @@
 "use server"
 
 // fetch enquiry data
-export async function fetchEnquiryData() {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/enquiry/get`);
+export async function fetchEnquiryData(userId) {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/enquiry/get?userId=${userId}`);
 
     if (!res.ok) {
         throw new Error('Failed to fetch data');

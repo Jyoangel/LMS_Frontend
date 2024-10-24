@@ -7,18 +7,48 @@ import { FaAngleLeft, FaAngleRight } from "react-icons/fa6";
 import { SlRefresh } from "react-icons/sl";
 import CourseTable from "./CourseTable";
 import { fetchCourseData } from "../../../../api/courseapi"; // api to fetch course count 
+import { checkUserRole } from "../../../../api/api"; // Import checkUserRole function
+import { useUser } from '@auth0/nextjs-auth0/client';
 
 
 export default function Course() {
   const [filter, setFilter] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [totalCourses, setTotalCourses] = useState(0);
+  const [userId, setUserId] = useState(null);
+  const { user, error: authError, isLoading: userLoading } = useUser();
+
+
+  // Check user role and retrieve userId
+  useEffect(() => {
+    if (!user) return;
+    async function getUserRole() {
+      const email = user?.email; // Ensure user email is available
+      if (!email) return; // Prevent unnecessary fetch
+
+      try {
+        const result = await checkUserRole(email); // Use the imported function
+
+        if (result.exists) {
+          setUserId(result.userId); // Set userId from the response
+        } else {
+          setError("User not found or does not exist.");
+        }
+      } catch (error) {
+        console.error("Error fetching user role:", error);
+        setError("Failed to fetch user role.");
+      }
+    }
+
+    getUserRole();
+  }, [user]);
 
   // call api to fetch course count 
   useEffect(() => {
+    if (!userId) return;
     const getData = async () => {
       try {
-        const data = await fetchCourseData();
+        const data = await fetchCourseData(userId);
         // Update your component state with data
         setTotalCourses(data.count);
       } catch (error) {
@@ -28,7 +58,7 @@ export default function Course() {
     };
 
     getData();
-  }, []);
+  }, [userId]);
 
   return (
     <>

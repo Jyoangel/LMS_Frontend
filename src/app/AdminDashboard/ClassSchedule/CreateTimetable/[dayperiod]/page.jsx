@@ -6,6 +6,8 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { FaArrowLeftLong } from "react-icons/fa6";
 import { addClassScheduleData } from "../../../../../../api/classScheduleapi"; // API to add calendar
+import { useUser } from '@auth0/nextjs-auth0/client';
+
 
 export default function CreateTimetable({ params }) {
   const { dayperiod } = params;
@@ -16,6 +18,7 @@ export default function CreateTimetable({ params }) {
   const [day, setDay] = useState("");
   const [period, setPeriod] = useState("");
   const [classValue, setClass] = useState("");
+  const { user, error, isLoading } = useUser();
 
   useEffect(() => {
     if (dayperiod) {
@@ -49,6 +52,7 @@ export default function CreateTimetable({ params }) {
       endTime,
       day,
       period,
+      userId: user.sub,
     };
 
     try {

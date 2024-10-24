@@ -7,13 +7,37 @@ import dayjs from "dayjs";
 import { useUser } from '@auth0/nextjs-auth0/client'; // fetch login user from auth0
 import { fetchAttendanceByStudentId } from "../../../../api/attendanceapi"; // api to fetch attendance by studentID 
 import { updateAttendanceByStudentId } from "../../../../api/attendanceapi"; // api to update attendance by studentID 
+import { checkUserRole } from "../../../../api/api"; // Import checkUserRole function
 
 const AttendanceCalendar = () => {
   const [attendance, setAttendance] = useState({});
+  const [studentID, setstudentID] = useState(null);
   const { user, isLoading } = useUser();
   const today = dayjs().format("YYYY-MM-DD");
+  useEffect(() => {
+    if (!user) return;
+    async function getUserRole() {
+      const email = user?.email; // Ensure user email is available
+      if (!email) return; // Prevent unnecessary fetch
 
-  const studentId = "66cc0a5e9fae1990a3916b66"; // Example studentId, should be dynamic
+      try {
+        const result = await checkUserRole(email); // Use the imported function
+
+        if (result.exists) {
+          setstudentID(result.studentID); // Set userId from the response
+        } else {
+          setError("User not found or does not exist.");
+        }
+      } catch (error) {
+        console.error("Error fetching user role:", error);
+        setError("Failed to fetch user role.");
+      }
+    }
+
+    getUserRole();
+  }, [user]);
+
+  //const studentId = studentID//"6715f330d0d7206596a83087"; // Example studentId, should be dynamic
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -23,9 +47,10 @@ const AttendanceCalendar = () => {
 
   useEffect(() => {
     // Fetch attendance data by the studentId
+    if (!studentID) return;
     const fetchData = async () => {
       try {
-        const data = await fetchAttendanceByStudentId(studentId);
+        const data = await fetchAttendanceByStudentId(studentID);
         if (data.length > 0 && data[0].dates) {
           // Map attendance to the date in 'YYYY-MM-DD' format
           const formattedAttendance = data[0].dates.reduce((acc, record) => {
@@ -41,7 +66,7 @@ const AttendanceCalendar = () => {
     };
 
     fetchData();
-  }, [studentId]);
+  }, [studentID]);
 
   const handleAttendanceToggle = async (dateKey) => {
     if (dateKey !== today) {

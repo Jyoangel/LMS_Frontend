@@ -1,7 +1,7 @@
 // fetch course data
 
-export async function fetchCourseData() {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/course/get`);
+export async function fetchCourseData(userId) {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/course/get?userId=${userId}`);
 
     if (!res.ok) {
         throw new Error('Failed to fetch data');
@@ -11,28 +11,28 @@ export async function fetchCourseData() {
 }
 
 
+
 // add course data
 export async function addCourseData(formData) {
     try {
+
+
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/course/add`, {
             method: 'POST',
-            body: formData, // Use FormData object here
+            body: formData, // Use FormData object with userId included
         });
 
-        // Check if the server response is not OK (status code is not in the range of 200-299)
         if (!res.ok) {
-            // Try to extract the error message from the response body
             const errorData = await res.json();
-            // Throw an error with the message returned from the server
             throw new Error(errorData.message || 'Failed to add course data');
         }
 
-        return res.json(); // Parse the JSON data if the response is OK
+        return res.json();
     } catch (error) {
-        // Catch any network or server errors
         throw new Error(error.message || 'Something went wrong while adding course data');
     }
 }
+
 
 // delete course data
 

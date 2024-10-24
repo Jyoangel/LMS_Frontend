@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { fetchStaffData, deleteStaffData } from "../../../../../api/staffapi"; // api to fetch and delete staff data 
 import { format } from "date-fns";
+import { useUser } from '@auth0/nextjs-auth0/client'; // Import Auth0 client hook
 
 export default function StaffManagementTable({ filter, searchTerm }) {
   const [data, setData] = useState({ staff: [] });
@@ -11,6 +12,10 @@ export default function StaffManagementTable({ filter, searchTerm }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [staffToDelete, setStaffToDelete] = useState(null);
+
+
+  // Get the authenticated user details from Auth0
+  const { user, error: authError, isLoading: userLoading } = useUser();
 
   const openDelete = (id) => {
     setStaffToDelete(id);
@@ -35,7 +40,7 @@ export default function StaffManagementTable({ filter, searchTerm }) {
   /// use to call fetch staff data 
   const loadItems = async () => {
     try {
-      const data = await fetchStaffData();
+      const data = await fetchStaffData(user.sub);
       setData(data);
       setLoading(false);
     } catch (error) {
@@ -45,8 +50,14 @@ export default function StaffManagementTable({ filter, searchTerm }) {
   };
 
   useEffect(() => {
-    loadItems();
-  }, []);
+    if (!userLoading && !authError) {
+      loadItems(); // Load data only when user is authenticated
+    }
+  }, [user, userLoading, authError]); // Trigger loadItems when user is available
+
+  if (userLoading) return <div>Loading...</div>; // Show loading indicator while fetching user details
+  if (authError) return <div>{authError.message}</div>; // Handle authentication error
+
 
   const filteredData = data.staff.filter(
     (item) =>

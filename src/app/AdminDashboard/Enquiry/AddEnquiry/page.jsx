@@ -5,14 +5,18 @@ import Link from "next/link";
 import { useState } from "react";
 import { FaArrowLeftLong } from "react-icons/fa6";
 import { addEnquiryData } from "../../../../../api/enquiryapi"; // add api 
+import { useUser } from '@auth0/nextjs-auth0/client';
 
 export default function AddEnquiry() {
   const [isSelectOpen, setisSelectOpen] = useState(false);
+  const { user, error, isLoading } = useUser();
+
   const [formData, setFormData] = useState({
     name: "",
     contactNumber: "",
     email: "",
     enquiryRelated: "",
+    userId: user ? user.sub : '',
   });
 
   const openModal = () => {

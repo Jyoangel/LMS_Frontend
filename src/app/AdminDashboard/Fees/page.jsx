@@ -6,7 +6,7 @@ import { SlRefresh } from "react-icons/sl";
 import FeesTable from "./Component/FeesTable";
 import { fetchFeeData } from "../../../../api/api";
 import { fetchCountData } from "../../../../api/api"; // Import the fetchCountData function
-
+import { useUser } from '@auth0/nextjs-auth0/client'; // Import Auth0 client hook
 export default function Fees() {
   const [filter, setFilter] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
@@ -15,17 +15,17 @@ export default function Fees() {
   const [totalStudentCount, setTotalStudentCount] = useState(0); // State to store student count
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  const { user, error: authError, isLoading: userLoading } = useUser();
   useEffect(() => {
     const loadTotalFees = async () => {
       try {
         // Fetch the fee data
-        const feeData = await fetchFeeData();
+        const feeData = await fetchFeeData(user.sub);
         setTotalFeesCount(feeData.totalFeesCount);
         setTotalPaidAmount(feeData.totalPaidAmount);
 
         // Fetch the total student count
-        const studentCountData = await fetchCountData();
+        const studentCountData = await fetchCountData(user.sub);
         setTotalStudentCount(studentCountData.count); // Assuming totalStudents is the correct field
 
         setLoading(false);

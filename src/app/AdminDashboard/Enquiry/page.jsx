@@ -7,16 +7,19 @@ import { FaAngleLeft, FaAngleRight } from "react-icons/fa6";
 import { SlRefresh } from "react-icons/sl";
 import EnquiryTable from "./EnquiryTable";
 import { fetchEnquiryData } from "../../../../api/enquiryapi";
+import { useUser } from '@auth0/nextjs-auth0/client';
 
 export default function Enquiry() {
   const [filter, setFilter] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [totalEnquiries, setTotalEnquiries] = useState(0);
+  const { user, error, isLoading } = useUser();
+
 
   useEffect(() => {
     async function loadEnquiries() {
       try {
-        const data = await fetchEnquiryData();
+        const data = await fetchEnquiryData(user.sub);
         setTotalEnquiries(data.count || 0); // Ensure it defaults to 0
       } catch (error) {
         console.error("Failed to fetch enquiry data:", error);

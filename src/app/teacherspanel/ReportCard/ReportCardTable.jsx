@@ -4,15 +4,44 @@
 
 import { useEffect, useState } from "react";
 import { fetchStudentData } from "../../../../api/api"; // api to fetch student data 
-import Link from "next/link";
+import Link from "next/link"
+import { checkUserRole } from "../../../../api/teacherapi"; // Import checkUserRole function
+import { useUser } from '@auth0/nextjs-auth0/client';;
 
 export default function ReportCardTable({ filter, searchTerm }) {
   const [data, setData] = useState({ students: [] });
+  const [userId, setUserId] = useState(null);
+  const { user, error: authError, isLoading: userLoading } = useUser();
+  // Check user role and retrieve userId
+  useEffect(() => {
+    if (!user) return;
+    async function getUserRole() {
+      const email = user?.email; // Ensure user email is available
+      if (!email) return; // Prevent unnecessary fetch
+
+      try {
+        const result = await checkUserRole(email); // Use the imported function
+
+        if (result.exists) {
+          setUserId(result.userId); // Set userId from the response
+        } else {
+          setError("User not found or does not exist.");
+        }
+      } catch (error) {
+        console.error("Error fetching user role:", error);
+        setError("Failed to fetch user role.");
+      }
+    }
+
+    getUserRole();
+  }, [user]);
+
   // use to fetch the student data
   useEffect(() => {
+    if (!userId) return;
     async function fetchData() {
       try {
-        const studentDataResponse = await fetchStudentData();
+        const studentDataResponse = await fetchStudentData(userId);
         setData(studentDataResponse); // Fetch student data instead of admit card data
       } catch (error) {
         console.error("Failed to fetch data:", error);
@@ -20,7 +49,7 @@ export default function ReportCardTable({ filter, searchTerm }) {
     }
 
     fetchData();
-  }, []);
+  }, [userId]);
 
   const filteredData = data.students.filter(
     (item) =>

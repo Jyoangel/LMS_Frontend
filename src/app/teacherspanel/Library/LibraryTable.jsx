@@ -5,22 +5,51 @@ import { format } from "date-fns";
 import { fetchLibraryData } from "../../../../api/libraryapi"; // api to fetch library data 
 import download from "./download.png";
 import Image from "next/image";
+import { checkUserRole } from "../../../../api/teacherapi"; // Import checkUserRole function
+import { useUser } from '@auth0/nextjs-auth0/client';
 
 export default function LibraryTable({ filter, searchTerm }) {
   const [libraryData, setLibraryData] = useState([]);
-
+  const [userId, setUserId] = useState(null);
+  const { user, error: authError, isLoading: userLoading } = useUser();
   // Fetch  library data on component mount
+
+  // Check user role and retrieve userId
   useEffect(() => {
+    if (!user) return;
+    async function getUserRole() {
+      const email = user?.email; // Ensure user email is available
+      if (!email) return; // Prevent unnecessary fetch
+
+      try {
+        const result = await checkUserRole(email); // Use the imported function
+
+        if (result.exists) {
+          setUserId(result.userId); // Set userId from the response
+        } else {
+          setError("User not found or does not exist.");
+        }
+      } catch (error) {
+        console.error("Error fetching user role:", error);
+        setError("Failed to fetch user role.");
+      }
+    }
+
+    getUserRole();
+  }, [user]);
+
+  useEffect(() => {
+    if (!userId) return;
     async function fetchData() {
       try {
-        const data = await fetchLibraryData();
+        const data = await fetchLibraryData(userId);
         setLibraryData(data.libraryItems);
       } catch (error) {
         console.error('Failed to fetch library data:', error);
       }
     }
     fetchData();
-  }, []);
+  }, [userId]);
 
   // Apply filter and search term to data
   const filteredData = (libraryData || []).filter(
@@ -64,7 +93,7 @@ export default function LibraryTable({ filter, searchTerm }) {
                 <td className="py-4 px-6 text-left">{item.authorName}</td>
                 <td className="py-4 px-6 text-left w-56">{item.description}</td>
                 <td className="py-4 px-6 text-left flex gap-2">
-                  <Link href={`http://localhost:5000/api/library/${item.uploadBookPdf}`} target="_blank">
+                  <Link href={`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/library/${item.uploadBookPdf}`} target="_blank">
                     <Image src={download} alt="Download PDF" />
                   </Link>
 

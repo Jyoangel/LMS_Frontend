@@ -1,6 +1,6 @@
 // fetch class schedule data
-export async function fetchClassScheduleData() {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/classSchedule/get`);
+export async function fetchClassScheduleData(userId) {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/classSchedule/get?userId=${userId}`);
 
     if (!res.ok) {
         throw new Error('Failed to fetch data');
@@ -12,9 +12,9 @@ export async function fetchClassScheduleData() {
 
 // api/classScheduleApi.js
 
-export const fetchClassScheduleByClass = async (className) => {
+export const fetchClassScheduleByClass = async (className, userId) => {
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/classSchedule/class?class=${encodeURIComponent(className)}`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/classSchedule/class?class=${encodeURIComponent(className)}&userId=${encodeURIComponent(userId)}`);
         if (!response.ok) {
             throw new Error(`Failed to fetch class schedule: ${response.statusText}`);
         }
@@ -25,6 +25,7 @@ export const fetchClassScheduleByClass = async (className) => {
         throw error;
     }
 };
+
 
 
 // add class schedule data

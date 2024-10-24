@@ -5,9 +5,12 @@ import Successcard from "@/Components/Successcard";
 import Link from "next/link";
 import { FaArrowLeftLong } from "react-icons/fa6";
 import { addStaffData } from '../../../../../api/staffapi';// api to add staff 
+import { useUser } from '@auth0/nextjs-auth0/client';
+
 
 const StaffDetail = () => {
     const [isSelectOpen, setisSelectOpen] = useState(false);
+    const { user, error, isLoading } = useUser();
 
     const openModal = () => {
         setisSelectOpen(true);
@@ -36,6 +39,7 @@ const StaffDetail = () => {
         nationality: '',
         languageSpoken: '',
         salary: '',
+        userId: user ? user.sub : '',
     };
 
     const [formData, setFormData] = useState(initialFormData);

@@ -15,6 +15,7 @@ import Peer from "simple-peer";
 import CallerCard from "./CallerCard";
 import ReceiverCard from "./ReceiverCard";
 import axios from "axios";
+import { checkUserRole } from "../../../../api/api"; // Import checkUserRole function
 import { useUser } from "@auth0/nextjs-auth0/client";
 
 const socket = io(`${process.env.NEXT_PUBLIC_API_SERVER_URL}`); // socket backend connect URL 
@@ -41,7 +42,8 @@ export default function Chats() {
   const [incomingCall, setIncomingCall] = useState(null);  // Manages the incoming call data
   const [call_duration, set_call_duration] = useState(0); // Track call duration in seconds
   const call_timer_ref = useRef(null);
-
+  const [userId, setUserId] = useState(null);
+  const [studentId, setStudentId] = useState(null);
   const { user, error: userError, isLoading: userLoading } = useUser();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -50,13 +52,44 @@ export default function Chats() {
   const [selectedUser, setSelectedUser] = useState(null);
 
   // use to fetch user using auth0 
+
+  // Check user role and retrieve userId
+  useEffect(() => {
+    async function getUserRole() {
+      const email = user?.email; // Ensure user email is available
+      if (!email) return; // Prevent unnecessary fetch
+
+      try {
+        const result = await checkUserRole(email); // Use the imported function
+
+        if (result.exists) {
+          setUserId(result.userId);
+          setStudentId(result.studentID);// Set userId from the response
+        } else {
+          setError("User not found or does not exist.");
+        }
+      } catch (error) {
+        console.error("Error fetching user role:", error);
+        setError("Failed to fetch user role.");
+      }
+    }
+
+    getUserRole();
+  }, [user]);
+
+
   useEffect(() => {
     async function fetchUsers() {
+      if (!user || !userId) return; // Ensure user and userId are available
+
       try {
-        const response = await axios.get("/api/fetchUsers");
-        const otherUsers = response.data.filter((u) => u.user_id !== user.sub);
-        console.log("Fetched Users:", otherUsers);
-        setUsers(otherUsers);
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/chat/fetchUsers?userId=${userId}`);
+        console.log("Fetched Users:", response.data);
+
+        // Filter out the logged-in user by comparing emails
+        const filteredUsers = response.data.filter(fetchedUser => fetchedUser.email !== user.email);
+
+        setUsers(filteredUsers); // Set the filtered users
       } catch (error) {
         console.error("Error fetching users:", error);
         setError("Error fetching users");
@@ -65,10 +98,8 @@ export default function Chats() {
       }
     }
 
-    if (user) {
-      fetchUsers();
-    }
-  }, [user]);
+    fetchUsers();
+  }, [user, userId]);
 
   // useEffect(() => {
   //   if (user) {
@@ -153,7 +184,7 @@ export default function Chats() {
   useEffect(() => {
     if (user) {
       // Register the user with the socket when available
-      socket.emit("register", user.sub);
+      socket.emit("register", studentId);
     }
 
     if (selectedUser) {
@@ -161,7 +192,7 @@ export default function Chats() {
       const fetchMessages = async () => {
         try {
           const response = await fetch(
-            `${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/chat/messages?sender=${user.sub}&receiver=${selectedUser.user_id}`
+            `${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/chat/messages?sender=${studentId}&receiver=${selectedUser._id}`
           );
           if (response.ok) {
             const data = await response.json();
@@ -181,8 +212,8 @@ export default function Chats() {
     // Handle incoming messages
     socket.on("receiveMessage", (message) => {
       if (
-        (message.sender === user.sub && message.receiver === selectedUser?.user_id) ||
-        (message.receiver === user.sub && message.sender === selectedUser?.user_id)
+        (message.sender === studentId && message.receiver === selectedUser?._id) ||
+        (message.receiver === studentId && message.sender === selectedUser?._id)
       ) {
         setMessages((prevMessages) => [...prevMessages, message]);
       }
@@ -193,7 +224,7 @@ export default function Chats() {
       console.log("Incoming Call Signal Data:", data.signal);
       console.log("Receiving call from:", data.from);
 
-      if (data.to === selectedUser?.user_id) {
+      if (data.to === selectedUser?._id) {
         setIncomingSignal(data.signal);
         setCallerId(data.from);
         setShowReceiverCard(true);
@@ -209,11 +240,11 @@ export default function Chats() {
     // Handle the answer signal for the call
     socket.on("answer", (data) => {
       console.log("Answer event received, data:", data);
-      console.log("Answer event received: to =", data.to, "user.sub =", user?.sub);
-      console.log("Current user ID (user.sub):", user?.sub);
+      console.log("Answer event received: to =", data.to, "user.sub =", studentId);
+      console.log("Current user ID (user.sub):", studentId);
       console.log("Peer object at answer event:", peer);
 
-      if (data.to === user?.sub && peer) {
+      if (data.to === studentId && peer) {
         console.log("Caller received answer signal:", data.signal);
 
         console.log(data.to);
@@ -260,8 +291,8 @@ export default function Chats() {
   const handleSendMessage = async () => {
     if (!selectedUser) return;
 
-    const senderId = user.sub;
-    const receiverId = selectedUser.user_id;
+    const senderId = studentId;
+    const receiverId = selectedUser._id;
     const senderModel = "TeacherDetail";
     const receiverModel = "TeacherDetail";
 
@@ -420,8 +451,8 @@ export default function Chats() {
   const handleMouseLeave = () => {
     stopRecording();
     if (recordedAudio && selectedUser) {
-      const senderId = user.sub;
-      const receiverId = selectedUser.user_id;
+      const senderId = studentId;
+      const receiverId = selectedUser._id;
       const senderModel = 'TeacherDetail';
       const receiverModel = 'TeacherDetail';
 
@@ -605,8 +636,8 @@ export default function Chats() {
           console.log("Caller Signal Data:", signal);
           socket.emit("call", {
             signal,
-            to: selectedUser.user_id,
-            from: user.sub,
+            to: selectedUser._id,
+            from: studentId,
           });
         });
         //set
@@ -656,7 +687,7 @@ export default function Chats() {
       socket.emit("answer", {
         signal,
         to: callerId, // Send the answer back to the caller
-        from: user.sub,
+        from: studentId,
       });
 
     });
@@ -731,7 +762,7 @@ export default function Chats() {
     }
 
     // Notify the other user
-    socket.emit('callEnded', { to: callerId || receiverId, from: user.sub });
+    socket.emit('callEnded', { to: callerId || receiverId, from: studentId });
 
     setLocalStream(null);
     setRemoteStream(null);
@@ -791,7 +822,7 @@ export default function Chats() {
           ) : (
             users.map((user) => (
               <button
-                key={user.user_id}
+                key={user._id}
                 onClick={() => {
                   setSelectedUser(user);
                   setMessages([]); // Clear the previous messages when selecting a new user
@@ -813,7 +844,7 @@ export default function Chats() {
                     </div>
                   )}
                 </div>
-                <div className="ml-2 text-sm font-semibold">{user.nickname}</div>
+                <div className="ml-2 text-sm font-semibold">{user.name}</div>
               </button>
             ))
           )}
@@ -823,7 +854,7 @@ export default function Chats() {
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-bold">
             {/* use to select user whom to chat */}
-            {selectedUser ? selectedUser.nickname : 'Select a user to chat'}
+            {selectedUser ? selectedUser.name : 'Select a user to chat'}
           </h2>
           <div className="flex items-center">
 
@@ -848,8 +879,8 @@ export default function Chats() {
             //console.log('Message:', msg);
             //console.log('Sender ID:', senderId);
             //console.log('Is sender ID equal to msg.sender?', senderId === msg.sender);
-            <div key={index} className={`w-full flex items-center justify-${msg.sender === user.sub ? 'end' : 'start'}`}>
-              {msg.sender === user.sub ? (
+            <div key={index} className={`w-full flex items-center justify-${msg.sender === studentId ? 'end' : 'start'}`}>
+              {msg.sender === studentId ? (
                 <ChatBubbleLeft text={msg.text} time={msg.time} fileUrl={msg.fileUrl}
                   voiceUrl={msg.voiceUrl} />
               ) : (

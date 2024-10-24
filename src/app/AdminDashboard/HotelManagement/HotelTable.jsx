@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { fetchStudentData } from "../../../../api/api"; // api to fetch student data 
 import { fetchHotelBystudentID, deleteHotelDataStudentID } from "../../../../api/hotelapi"; // api to fetchhostel and delete hostel data by studentID 
 import { format } from "date-fns";
+import { useUser } from '@auth0/nextjs-auth0/client'; // Import Auth0 client hook
 
 export default function HotelTable({ filter, searchTerm }) {
   const [hotelData, setHotelData] = useState([]);
@@ -15,13 +16,15 @@ export default function HotelTable({ filter, searchTerm }) {
   const [deleteId, setDeleteId] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  const { user, error: authError, isLoading: userLoading } = useUser();
 
   // use to fetch student data 
   useEffect(() => {
     async function getData() {
       try {
-        const data = await fetchStudentData();
+        const data = await fetchStudentData(user.sub
+
+        );
         const students = data.students;
 
         // Fetch hotel data for each student

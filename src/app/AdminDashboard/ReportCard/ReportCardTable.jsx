@@ -5,14 +5,17 @@
 import { useEffect, useState } from "react";
 import { fetchStudentData } from "../../../../api/api";// fetch student data 
 import Link from "next/link";
+import { useUser } from '@auth0/nextjs-auth0/client';
+
 
 export default function ReportCardTable({ filter, searchTerm }) {
   const [data, setData] = useState({ students: [] });
+  const { user, error, isLoading } = useUser(); // Get user from Auth0
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const studentDataResponse = await fetchStudentData();
+        const studentDataResponse = await fetchStudentData(user.sub);
         setData(studentDataResponse); // Fetch student data instead of admit card data
       } catch (error) {
         console.error("Failed to fetch data:", error);

@@ -188,7 +188,7 @@ export default function FeeSlip({ onClose, feeId }) {
             </div>
             <div className="h-[30px] w-full bg-gray-200 flex flex-row items-center justify-between px-5">
               <h1 className="text-sm text-black font-semibold">
-                Total :  Rs {feeDetails.total}
+                Total :  Rs {feeDetails.studentID?.totalFee}
               </h1>
               <h1 className="text-sm text-black font-semibold">
                 Dues:  Rs {feeDetails.dueAmount}{" "}

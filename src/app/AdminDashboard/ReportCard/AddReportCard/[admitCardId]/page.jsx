@@ -6,17 +6,23 @@ import { FaArrowLeftLong } from "react-icons/fa6";
 import Successcard from "@/Components/Successcard";
 import { addReportCardData } from "../../../../../../api/reportcardapi"; // add api report card 
 import { fetchAdmitCardById } from "../../../../../../api/reportcardapi"; // fetch api admit card by id 
+import { useUser } from '@auth0/nextjs-auth0/client';
+
 
 export default function AddReportCard({ params }) {
   const { admitCardId } = params;
   const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [admitCard, setAdmitCard] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");// To store AdmitCard data
+  const { user, isLoading } = useUser();
+
+
   const [formData, setFormData] = useState({
     //type: "",
     marks: {},
     classTeacher: "",
-    admitCardId: admitCardId
+    admitCardId: admitCardId,
+    userId: user.sub
   });
 
   // Fetch AdmitCard data by ID when component mounts

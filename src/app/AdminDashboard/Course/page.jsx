@@ -9,6 +9,7 @@ import { SlRefresh } from "react-icons/sl";
 import CourseTable from "./CourseTable";
 import { fetchCourseData } from "../../../../api/courseapi"; // api to fetch course data 
 import { importCourseData } from "../../../../api/courseapi"; // api to import course data 
+import { useUser } from '@auth0/nextjs-auth0/client'; // Import Auth0 client hook
 
 export default function Course() {
   const [filter, setFilter] = useState("");
@@ -16,13 +17,13 @@ export default function Course() {
   const [totalCourses, setTotalCourses] = useState(0);
   const [message, setMessage] = useState(""); // For displaying success/error messages
   const fileInputRef = useRef(null); // Reference to the file input
-
+  const { user, error: authError, isLoading: userLoading } = useUser();
 
   // use to call api to fetch coursecount 
   useEffect(() => {
     async function loadCourses() {
       try {
-        const data = await fetchCourseData();
+        const data = await fetchCourseData(user.sub);
         setTotalCourses(data.count);
       } catch (error) {
         console.error("Failed to fetch courses data:", error);

@@ -1,12 +1,43 @@
 "use client";
 import Successcard from "@/Components/Successcard";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaArrowLeftLong } from "react-icons/fa6";
 import { addAssignmentData } from "../../../../../api/assignmentapi"; // api to add assignment data 
+import { checkUserRole } from "../../../../../api/teacherapi"; // Import checkUserRole function
+import { useUser } from '@auth0/nextjs-auth0/client';
 
 export default function AddAssignment() {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
+  const [userId, setUserId] = useState(null);
+  const { user, error: authError, isLoading: userLoading } = useUser();
+  const [error, setError] = useState(null); // For handling errors
+
+  // Check user role and retrieve userId
+  useEffect(() => {
+    async function getUserRole() {
+      const email = user?.email; // Ensure user email is available
+      if (!email) return; // Prevent unnecessary fetch
+
+      try {
+        const result = await checkUserRole(email); // Use the imported function
+
+        if (result.exists) {
+          setUserId(result.userId); // Set userId from the response
+        } else {
+          setError("User not found or does not exist.");
+        }
+      } catch (error) {
+        console.error("Error fetching user role:", error);
+        setError("Failed to fetch user role.");
+      }
+    }
+
+    if (user) {
+      getUserRole();
+    }
+  }, [user]);
+
   const [formData, setFormData] = useState({
     assignmentCode: "",
     assignmentTitle: "",
@@ -19,7 +50,8 @@ export default function AddAssignment() {
     assignTo: "",
     courseDescription: "",
     createdBy: "",
-    uploadAssignment: null, // Initialize with null
+    uploadAssignment: null,
+    userId: "" // Keep userId blank initially
   });
 
   const openModal = () => {
@@ -39,7 +71,14 @@ export default function AddAssignment() {
     }
   };
 
-  // use to submit  the form and add  call api to add assignment 
+  // useEffect to update formData when userId is fetched
+  useEffect(() => {
+    if (userId) {
+      setFormData((prevData) => ({ ...prevData, userId })); // Update userId in formData
+    }
+  }, [userId]);
+
+  // Submit the form and call API to add assignment 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -83,7 +122,8 @@ export default function AddAssignment() {
         assignTo: "",
         courseDescription: "",
         createdBy: "",
-        uploadAssignment: null // Clear file input after submission
+        uploadAssignment: null, // Clear file input after submission
+        userId: "" // Reset userId
       });
       openModal();
     } catch (error) {
@@ -91,6 +131,9 @@ export default function AddAssignment() {
       alert(`Error: ${error.message}`);
     }
   };
+
+
+
 
 
   return (

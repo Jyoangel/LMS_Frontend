@@ -1,6 +1,6 @@
 //fetch Library get 
-export async function fetchLibraryData() {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/library/get`);
+export async function fetchLibraryData(userId) {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/library/get?userId=${userId}`);
 
     if (!res.ok) {
         throw new Error('Failed to fetch data');

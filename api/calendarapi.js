@@ -1,8 +1,8 @@
 "use server"
 
 //fetch calendar data
-export async function fetchCalendarData() {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/calendar/get`);
+export async function fetchCalendarData(userId) {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/calendar/get?userId=${userId}`);
 
     if (!res.ok) {
         throw new Error('Failed to fetch data');

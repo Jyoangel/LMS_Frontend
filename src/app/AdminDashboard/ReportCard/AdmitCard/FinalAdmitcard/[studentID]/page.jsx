@@ -5,10 +5,11 @@ import { RxCrossCircled } from "react-icons/rx";
 import Image from "next/image";
 import logo from "../../logo.png";
 import { fetchAdmitCardByStudentID, fetchReportCardByStudentID, deleteAdmitCardData } from "../../../../../../../api/reportcardapi"; // api to fetch admitcard  report card by student ID and delete admit card  
-import { fetchAdminUser } from "../../../../../../../api/adminUser";// use to fetch admin details
+import { fetchAdminUserByUserId } from "../../../../../../../api/adminUser";// use to fetch admin details
 import { format } from "date-fns";
 import Link from "next/link";
 import { FaArrowLeftLong } from "react-icons/fa6";
+import { useUser } from '@auth0/nextjs-auth0/client';
 
 
 export default function FinalAdmitcard({ params, onClose }) {
@@ -23,6 +24,7 @@ export default function FinalAdmitcard({ params, onClose }) {
   const [errorMessage, setErrorMessage] = useState(null);
   const [showAdmitCard, setShowAdmitCard] = useState(false);// To manage delete errors
   const noticeRef = useRef();
+  const { user, isLoading } = useUser(); // Get user from Auth0
 
   useEffect(() => {
     setLoading(true); // Start loading state when data fetching starts
@@ -89,7 +91,7 @@ export default function FinalAdmitcard({ params, onClose }) {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const adminUsers = await fetchAdminUser();
+        const adminUsers = await fetchAdminUserByUserId(user.sub);
         console.log(adminUsers); // Fetch admin users
         setAdminUsers(adminUsers); // Store fetched admin users
       } catch (error) {
@@ -166,10 +168,10 @@ export default function FinalAdmitcard({ params, onClose }) {
                   {/* Admit Card Info */}
 
                   <div className="flex flex-row gap-20">
-                    <Image src={adminUsers[0]?.picture} alt="Logo" className="h-[50px] w-[50px] rounded-full"
+                    <Image src={adminUsers?.picture} alt="Logo" className="h-[50px] w-[50px] rounded-full"
                       width={70} // Set width to avoid layout shift
                       height={70} />
-                    <h1 className="text-black text-lg font-bold">{adminUsers[0]?.name}</h1>
+                    <h1 className="text-black text-lg font-bold">{adminUsers?.name}</h1>
                   </div>
                   <div className="grid grid-cols-2 w-full gap-5">
                     {/* Left Column */}
@@ -239,11 +241,11 @@ export default function FinalAdmitcard({ params, onClose }) {
               >
 
                 <div className="flex flex-row gap-20">
-                  <Image src={adminUsers[0]?.picture} alt="Logo" className="h-[50px] w-[50px] rounded-full"
+                  <Image src={adminUsers?.picture} alt="Logo" className="h-[50px] w-[50px] rounded-full"
                     width={70} // Set width to avoid layout shift
                     height={70} />
                   <h1 className="text-black text-lg font-bold">
-                    {adminUsers[0]?.name}
+                    {adminUsers?.name}
                   </h1>
                 </div>
                 <div className="grid grid-cols-2 w-full gap-5">

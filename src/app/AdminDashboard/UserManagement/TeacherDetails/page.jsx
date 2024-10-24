@@ -4,10 +4,13 @@ import React, { useState } from 'react';
 import Successcard from "@/Components/Successcard";
 import Link from "next/link";
 import { FaArrowLeftLong } from "react-icons/fa6";
-import { addTeacherData } from '../../../../../api/teacherapi'; // add teacher api 
+import { addTeacherData } from '../../../../../api/teacherapi'; // add teacher api
+import { useUser } from '@auth0/nextjs-auth0/client';
 
 const TeacherDetail = () => {
     const [isSelectOpen, setisSelectOpen] = useState(false);
+    const { user, error, isLoading } = useUser();
+
 
     const openModal = () => {
         setisSelectOpen(true);
@@ -50,6 +53,7 @@ const TeacherDetail = () => {
             annualIncome: '',
             parentAddress: ''
         },
+        userId: user ? user.sub : '',
 
 
     };
@@ -506,7 +510,7 @@ const TeacherDetail = () => {
                     </div>
 
                     {/* Submit Button */}
-                    <button type="submit" className="bg-blue-500 text-white rounded-md px-6 py-3">
+                    <button type="submit" className="bg-blue-500 text-white rounded-md px-6 py-3 w-96">
                         Submit
                     </button>
                 </div>

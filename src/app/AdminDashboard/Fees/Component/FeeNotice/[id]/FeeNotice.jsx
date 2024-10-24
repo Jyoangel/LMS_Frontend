@@ -6,7 +6,8 @@ import Image from "next/image";
 import Successcard from "@/Components/Successcard";
 import logo from "../../../Component/logo.png";
 import { sendFeeNotice } from "../../../../../../../api/api"; // Adjust the path based on your project structure
-import { fetchAdminUser } from "../../../../../../../api/adminUser";
+import { fetchAdminUserByUserId } from "../../../../../../../api/adminUser";
+import { useUser } from '@auth0/nextjs-auth0/client';
 export default function FeeNotice({ studentID, onClose }) {
   const [message, setMessage] = useState('');
   const [remark, setRemark] = useState('');
@@ -16,12 +17,13 @@ export default function FeeNotice({ studentID, onClose }) {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(null);
   const noticeRef = useRef();
+  const { user, isLoading } = useUser(); // Get user from Auth0
 
   // Fetch admin users in a separate useEffect
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const adminUsers = await fetchAdminUser();
+        const adminUsers = await fetchAdminUserByUserId(user.sub);
         console.log(adminUsers); // Fetch admin users
         setAdminUsers(adminUsers); // Store fetched admin users
       } catch (error) {

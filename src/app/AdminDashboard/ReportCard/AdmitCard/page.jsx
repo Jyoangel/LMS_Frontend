@@ -5,14 +5,16 @@ import { useState } from "react";
 import { FaArrowLeftLong } from "react-icons/fa6";
 import Successcard from "@/Components/Successcard";
 import { addAdmitCardData } from "../../../../../api/reportcardapi"; // add admitcard api 
+import { useUser } from '@auth0/nextjs-auth0/client';
+
 
 export default function AdmitCard() {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
-
+  const { user, isLoading } = useUser();
   const [formData, setFormData] = useState({
 
     examination: "",
-
+    userId: user.sub,
     class: "",
     startdate: "",
     enddate: "",
@@ -78,7 +80,7 @@ export default function AdmitCard() {
       // call api to add admit card 
       const result = await addAdmitCardData(formData);
       console.log('Server Response:', result);
-      setErrorMessage(''); // Clear any previous error messages
+      //setErrorMessage(''); // Clear any previous error messages
       openModal();
     } catch (error) {
       console.error('Failed to add admit card data:', error);

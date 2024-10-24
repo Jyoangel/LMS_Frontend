@@ -5,6 +5,7 @@ import Link from "next/link";
 import { fetchCourseData, deleteCourseData } from "../../../../api/courseapi"; //  api for fetch  course and delete 
 import { deleteLiveClassData } from "../../../../api/liveclassapi"; // api to delete live class 
 import { format } from "date-fns";
+import { useUser } from '@auth0/nextjs-auth0/client'; // Import Auth0 client hook
 
 export default function CourseManagementTable({ filter = "", searchTerm = "" }) {
   const [data, setData] = useState({ courses: [] });
@@ -12,11 +13,12 @@ export default function CourseManagementTable({ filter = "", searchTerm = "" }) 
   const [error, setError] = useState(null);
   const [isDelete, setDelete] = useState(false);
   const [courseToDelete, setCourseToDelete] = useState(null);
+  const { user, error: authError, isLoading: userLoading } = useUser();
 
   useEffect(() => {
     async function getData() {
       try {
-        const fetchedData = await fetchCourseData();
+        const fetchedData = await fetchCourseData(user.sub);
         console.log("Fetched Data:", fetchedData);
         if (fetchedData && Array.isArray(fetchedData.courses)) {
           setData(fetchedData);

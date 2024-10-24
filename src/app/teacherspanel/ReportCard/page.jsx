@@ -8,16 +8,43 @@ import { FaAngleLeft, FaAngleRight } from "react-icons/fa6";
 import { SlRefresh } from "react-icons/sl";
 import ReportCardTable from "./ReportCardTable";
 import { fetchCountData } from "../../../../api/api";
+import { checkUserRole } from "../../../../api/teacherapi"; // Import checkUserRole function
+import { useUser } from '@auth0/nextjs-auth0/client';
 
 export default function ReportCard() {
   const [filter, setFilter] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [totalStudents, setTotalStudents] = useState(0);
+  const [userId, setUserId] = useState(null);
+  const { user, error: authError, isLoading: userLoading } = useUser();
+
+  // Check user role and retrieve userId
+  useEffect(() => {
+    async function getUserRole() {
+      const email = user?.email; // Ensure user email is available
+      if (!email) return; // Prevent unnecessary fetch
+
+      try {
+        const result = await checkUserRole(email); // Use the imported function
+
+        if (result.exists) {
+          setUserId(result.userId); // Set userId from the response
+        } else {
+          setError("User not found or does not exist.");
+        }
+      } catch (error) {
+        console.error("Error fetching user role:", error);
+        setError("Failed to fetch user role.");
+      }
+    }
+
+    getUserRole();
+  }, [user]);
 
   useEffect(() => {
     async function loadStudents() {
       try {
-        const data = await fetchCountData();
+        const data = await fetchCountData(userId);
         setTotalStudents(data.count); // Updated to use data.count
       } catch (error) {
         console.error("Failed to fetch courses data:", error);
@@ -25,7 +52,7 @@ export default function ReportCard() {
     }
 
     loadStudents();
-  }, []);
+  }, [userId]);
   return (
     <>
       <div className="h-screen w-full flex flex-col gap-6 p-5">
@@ -33,9 +60,7 @@ export default function ReportCard() {
         <div className="w-full flex items-center justify-between">
           <h1 className="text-base font-medium">Total Student Card:{totalStudents} </h1>
           <div className="flex items-center justify-center gap-5">
-            <button className="text-base font-semibold text-blue-500 underline">
-              import
-            </button>
+
             <Link href={"/AdminDashboard/ReportCard/SelectCard"}>
               <button className="text-base font-semibold text-white bg-blue-500 px-4 py-2 rounded-lg">
                 Add New
@@ -47,8 +72,7 @@ export default function ReportCard() {
         {/* student teacher staff */}
         <div className="h-12 w-full border border-gray-300 flex flex-row gap-6 p-2 py-3 rounded-lg">
           <h1 className="text-blue-500 underline font-medium">Students</h1>
-          <h1 className="text-gray-500 underline font-medium">Teachers</h1>
-          <h1 className="text-gray-500 underline font-medium">Staffs</h1>
+
         </div>
 
         {/* table */}

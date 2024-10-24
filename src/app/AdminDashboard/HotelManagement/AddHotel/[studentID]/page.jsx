@@ -4,7 +4,7 @@ import { useState } from "react";
 import Successcard from "@/Components/Successcard";
 import Link from "next/link";
 import { FaArrowLeftLong } from "react-icons/fa6";
-import { addHotelData, fetchHotelBystudentID } from "../../../../../../api/hotelapi"; // addd and fetch api
+import { addHotelData } from "../../../../../../api/hotelapi"; // addd and fetch api
 
 export default function AddHotel({ params }) {
   const { studentID } = params;

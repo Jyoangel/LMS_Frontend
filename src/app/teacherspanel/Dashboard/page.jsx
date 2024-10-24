@@ -20,12 +20,14 @@ import { fetchStudentData } from "../../../../api/api"; // api gto fetch student
 import { fetchClassAttendanceData, fetchSchoolOverviewData } from "../../../../api/attendanceapi"; // api to fetch attendance according ti class and api to fetch shool overview data 
 
 import { getData } from "../../../../api/api";// api to fetch count total student and present student
+import { checkUserRole } from "../../../../api/teacherapi"; // Import checkUserRole function
+import { useUser } from '@auth0/nextjs-auth0/client';
 
 const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
 const classColors = ['rgba(255, 99, 132, 0.5)', 'rgba(54, 162, 235, 0.5)', 'rgba(255, 206, 86, 0.5)', 'rgba(75, 192, 192, 0.5)']; // Define more colors if needed
 export default function Dashboard() {
-  const [data, setData] = useState([]);
+  const [data, setData] = useState({});
 
   const [events, setEvents] = useState([]);
   const [selectedClass, setSelectedClass] = useState('');
@@ -37,13 +39,45 @@ export default function Dashboard() {
   const [year, setYear] = useState(new Date().getFullYear());
   const [schoolOverviewData, setSchoolOverviewData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [userId, setUserId] = useState(null);
+  const { user, error: authError, isLoading: userLoading } = useUser();
 
 
-  // uset to fetch count 
+
+
+  // Check user role and retrieve userId
+  // Check user role and retrieve userId
   useEffect(() => {
+    if (!user) return; // Prevent unnecessary fetch if user data isn't available yet
+
+    async function getUserRole() {
+      const email = user?.email;
+      if (!email) return;
+
+      try {
+        const result = await checkUserRole(email); // Use the imported function
+        if (result.exists) {
+          setUserId(result.userId); // Set userId from the response
+        } else {
+          setError("User not found or does not exist.");
+        }
+      } catch (error) {
+        console.error("Error fetching user role:", error);
+        setError("Failed to fetch user role.");
+      }
+    }
+
+    getUserRole();
+  }, [user]);
+
+  // Fetch data when userId is available
+  useEffect(() => {
+    if (!userId) return;
+
     async function fetchData() {
       try {
-        const data = await getData();
+        const data = await getData(userId);
+        console.log("data", data);
         setData(data);
       } catch (err) {
         setError(err.message);
@@ -51,16 +85,17 @@ export default function Dashboard() {
         setLoading(false);
       }
     }
+
     fetchData();
-  }, []);
+  }, [userId]);
 
-
+  // Fetch student data when userId is available
   useEffect(() => {
-    // Fetch student  data when component loads
+    if (!userId) return;
+
     const fetchData = async () => {
       try {
-        const classData = await fetchStudentData();
-        console.log(classData);
+        const classData = await fetchStudentData(userId);
         setClasses(classData.students);
       } catch (error) {
         console.error('Error fetching class data:', error);
@@ -68,16 +103,12 @@ export default function Dashboard() {
     };
 
     fetchData();
-  }, []);
+  }, [userId]);
 
-
-  // useto fetch attendance using class 
-
-
+  // Fetch class attendance data when a class is selected
   useEffect(() => {
     if (selectedClass) {
       fetchClassAttendanceData(selectedClass).then(data => {
-        console.log('Fetched class attendance data:', data); // Log fetched data
         setClassData(data);
       }).catch(error => {
         console.error('Error fetching attendance data:', error);
@@ -85,70 +116,81 @@ export default function Dashboard() {
     }
   }, [selectedClass]);
 
-
+  // Fetch top students based on report card data
   useEffect(() => {
-    // Fetch report card data when the component mounts
+    if (!userId) return;
+
     const fetchData = async () => {
       try {
-        const data = await fetchReportCardData();
-        const filteredStudents = data.filter(student => student.percentage > 80);
-        setTopStudents(filteredStudents);
+        const data = await fetchReportCardData(userId);
+        const filteredStudents = data.filter(student => student.percentage > 75);
+        setTopStudents(filteredStudents.length ? filteredStudents : []);
       } catch (err) {
         setError(err.message);
       }
     };
 
     fetchData();
-  }, []);
+  }, [userId]);
 
-  // use to fetch top performing data 
+  // Fetch top performing students data
   useEffect(() => {
+    if (!userId) return;
+
     const getTopPerformingStudents = async () => {
       try {
-        // Fetch report card data
-        const reportData = await fetchReportCardData();
-
-        // Sort students by percentage (descending)
+        const reportData = await fetchReportCardData(userId);
         const sortedStudents = reportData.sort((a, b) => b.percentage - a.percentage);
-
-        // Select top 3 students
         const top3Students = sortedStudents.slice(0, 3);
 
-        // Extract top subjects for each student (based on marks)
         const topStudentsWithSubjects = top3Students.map(student => {
-          // Sort subjects by marks (descending)
           const topSubjects = student.subjects
-            .sort((a, b) => b.marks - a.marks)  // Sort subjects by marks
-            .slice(0, 3);  // Get top 3 subjects
+            .sort((a, b) => b.marks - a.marks)
+            .slice(0, 3);
 
           return {
-            name: student.name,  // Extract student's name from the reference
-            subjects: topSubjects.map(subject => subject.subjectName),  // Extract subject names
+            name: student.studentID.name,
+            subjects: topSubjects.map(subject => subject.subjectName),
           };
         });
 
-        setTopPerformingStudents(topStudentsWithSubjects);  // Set the updated variable with top students and subjects
+        setTopPerformingStudents(topStudentsWithSubjects);
       } catch (err) {
         setError(err.message);
+      }
+    };
+
+    getTopPerformingStudents();
+  }, [userId]);
+
+  // Fetch school overview data
+  useEffect(() => {
+    const getSchoolOverviewData = async () => {
+      setLoading(true);
+      try {
+        const data = await fetchSchoolOverviewData();
+        setSchoolOverviewData(data);
+      } catch (err) {
+        setError('Error fetching school overview data.');
       } finally {
         setLoading(false);
       }
     };
 
-    getTopPerformingStudents();
+    getSchoolOverviewData();
   }, []);
 
-
-  // use to fetch events using calendar 
+  // Fetch calendar events
   useEffect(() => {
+    if (!userId) return;
+
     async function fetchEvents() {
       try {
-        const eventData = await fetchCalendarData();
+        const eventData = await fetchCalendarData(userId);
         const currentDate = new Date();
         const currentMonth = currentDate.getMonth();
         const currentYear = currentDate.getFullYear();
 
-        // Filter the events to include only those for the current month and year
         const filteredEvents = eventData.filter(event => {
           const eventDate = new Date(event.date);
           return eventDate.getMonth() === currentMonth && eventDate.getFullYear() === currentYear;
@@ -159,28 +201,16 @@ export default function Dashboard() {
         setError(err.message);
       }
     }
+
     fetchEvents();
-  }, []);
+  }, [userId]);
+
+  if (userLoading || loading) {
+    return <div>Loading...</div>; // Display a loading spinner/message when user or data is still loading
+  }
 
 
-  // use to fetch school overview data 
-  useEffect(() => {
-    const getSchoolOverviewData = async () => {
-      setLoading(true);
-      const data = await fetchSchoolOverviewData();
-      if (data) {
-        setSchoolOverviewData(data);
-      } else {
-        setError('Error fetching school overview data.');
-      }
-      setLoading(false);
-    };
-
-    getSchoolOverviewData();
-  }, []);
-
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>{error}</div>;
+  //if (error) return <div>{error}</div>;
   // if (!data) {
   //   return <div>No data found</div>;
   // }
@@ -294,7 +324,7 @@ export default function Dashboard() {
               {topStudents.map((student) => (
                 <StudentCard
                   key={student.id} // assuming each student has a unique id
-                  name={student.name}
+                  name={student.studentID.name}
                   percentage={student.percentage}
                 />
               ))}

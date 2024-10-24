@@ -8,17 +8,19 @@ import Link from "next/link"; // Next.js link for navigation between pages
 import { useState, useEffect } from "react"; // React hooks for state and side-effects
 import dayjs from "dayjs"; // Importing Day.js for date formatting and manipulation
 import { fetchCalendarData } from "../../../../api/calendarapi"; // API function to fetch calendar data
+import { useUser } from '@auth0/nextjs-auth0/client';
+
 
 export default function CalendarPage() {
   const [calendarData, setCalendarData] = useState([]); // State to store the calendar events
   const [selectedDate, setSelectedDate] = useState(null); // State to store the currently selected date
-
+  const { user, error, isLoading } = useUser();
   // Fetch calendar data when the component mounts
   useEffect(() => {
     async function fetchData() {
       try {
         // Fetch the calendar data and update the state
-        const data = await fetchCalendarData();
+        const data = await fetchCalendarData(user.sub);
         setCalendarData(data);
         console.log(data); // Log the data for debugging
       } catch (error) {

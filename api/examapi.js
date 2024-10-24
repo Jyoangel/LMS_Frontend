@@ -1,7 +1,7 @@
 "use server"
 // fetch exam data
-export async function fetchExamData() {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/exam/get`);
+export async function fetchExamData(userId) {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/exam/get?userId=${userId}`);
 
     if (!res.ok) {
         throw new Error('Failed to fetch data');

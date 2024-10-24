@@ -5,16 +5,43 @@ import { useState } from "react";
 import { FaArrowLeftLong } from "react-icons/fa6";
 import Successcard from "@/Components/Successcard";
 import { addAdmitCardData } from "../../../../../api/reportcardapi"; // api to add admit card data 
+import { checkUserRole } from "../../../../../api/teacherapi"; // Import checkUserRole function
+import { useUser } from '@auth0/nextjs-auth0/client';
 
 export default function AdmitCard() {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
+  const [userId, setUserId] = useState(null);
+  const { user, error: authError, isLoading: userLoading } = useUser();
+
+
+
+  // Check user role and retrieve userId
+  useEffect(() => {
+    async function getUserRole() {
+      const email = user?.email; // Ensure user email is available
+      if (!email) return; // Prevent unnecessary fetch
+
+      try {
+        const result = await checkUserRole(email); // Use the imported function
+
+        if (result.exists) {
+          setUserId(result.userId); // Set userId from the response
+        } else {
+          setError("User not found or does not exist.");
+        }
+      } catch (error) {
+        console.error("Error fetching user role:", error);
+        setError("Failed to fetch user role.");
+      }
+    }
+
+    getUserRole();
+  }, [user]);
 
   const [formData, setFormData] = useState({
-    //examination_roll_number: "",
-    //school_name: "",
-    //session: "",
+
     examination: "",
-    //student_name: "",
+    userId: userId,
     class: "",
     startdate: "",
     enddate: "",
@@ -95,7 +122,7 @@ export default function AdmitCard() {
     <>
       <div className="h-screen w-full flex flex-col px-5 py-10 gap-10">
         <div className="w-full">
-          <Link href={"/AdminDashboard/ReportCard"}>
+          <Link href={"/teacherspanel/ReportCard"}>
             <button className="flex items-center justify-center gap-3">
               <FaArrowLeftLong className="h-10 w-10 bg-gray-100 rounded-full p-2" />
               <h1 className="text-lg font-semibold">Back</h1>
@@ -108,54 +135,7 @@ export default function AdmitCard() {
           {/* Student Details */}
           <div className="flex flex-col gap-8">
             <div className="w-full grid grid-cols-3 items-center gap-5">
-              {/* Examination Roll Number *
-              <div className="flex flex-col gap-3 w-full">
-                <label htmlFor="examination_roll_number" className="text-lg font-normal text-black">
-                  Examination Roll No*
-                </label>
-                <input
-                  id="examination_roll_number"
-                  type="text"
-                  name="examination_roll_number"
-                  value={formData.examination_roll_number}
-                  onChange={handleChange}
-                  placeholder="Type here"
-                  className="border border-gray-300 rounded-md w-full py-3 px-5 outline-none"
-                />
-              </div>
 
-              {/* School Name *
-              <div className="flex flex-col gap-3 w-full">
-                <label htmlFor="school_name" className="text-lg font-normal text-black">
-                  School Name*
-                </label>
-                <input
-                  id="school_name"
-                  type="text"
-                  name="school_name"
-                  value={formData.school_name}
-                  onChange={handleChange}
-                  placeholder="Type here"
-                  className="border border-gray-300 rounded-md w-full py-3 px-5 outline-none"
-                />
-              </div>
-*/}
-              {/* Session 
-              <div className="flex flex-col gap-3 w-full">
-                <label htmlFor="session" className="text-lg font-normal text-black">
-                  Session*
-                </label>
-                <input
-                  id="session"
-                  type="text"
-                  name="session"
-                  value={formData.session}
-                  onChange={handleChange}
-                  placeholder="Type here"
-                  className="border border-gray-300 rounded-md w-full py-3 px-5 outline-none"
-                />
-              </div>
-              */}
 
               {/* Examination */}
               <div className="flex flex-col gap-3 w-full">
@@ -173,22 +153,7 @@ export default function AdmitCard() {
                 />
               </div>
 
-              {/* Student Name *
-              <div className="flex flex-col gap-3 w-full">
-                <label htmlFor="student_name" className="text-lg font-normal text-black">
-                  Student Name*
-                </label>
-                <input
-                  id="student_name"
-                  type="text"
-                  name="student_name"
-                  value={formData.student_name}
-                  onChange={handleChange}
-                  placeholder="Type here"
-                  className="border border-gray-300 rounded-md w-full py-3 px-5 outline-none"
-                />
-              </div>
-              */}
+
 
               {/* Class*/}
               <div className="flex flex-col gap-3 w-full">
@@ -320,7 +285,7 @@ export default function AdmitCard() {
             </button>
           </div>
           {isSelectOpen && (
-            <Successcard onClose={closeModal} para={"Student added successfully!"} url={"/AdminDashboard/ReportCard"} />
+            <Successcard onClose={closeModal} para={"Student added successfully!"} url={"/teacherspanel/ReportCard"} />
           )}
         </form>
       </div>

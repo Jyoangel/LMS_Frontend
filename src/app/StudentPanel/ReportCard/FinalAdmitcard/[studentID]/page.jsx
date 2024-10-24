@@ -5,12 +5,14 @@ import { RxCrossCircled } from "react-icons/rx";
 import Image from "next/image";
 import logo from "../logo.png";
 import { fetchAdmitCardByStudentID, fetchReportCardByStudentID } from "../../../../../../api/reportcardapi"; // api to fetch admitcard ans report card vy student ID
-import { fetchAdminUser } from "../../../../../../api/adminUser";// use to fetch admin details
+import { fetchAdminUserByUserId } from "../../../../../../api/adminUser";// use to fetch admin details
 import { format } from "date-fns";
 import Link from "next/link";
 import { FaArrowLeftLong } from "react-icons/fa6";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import { checkUserRole } from "../../../../../../api/api"; // Import checkUserRole function
+import { useUser } from '@auth0/nextjs-auth0/client';
 
 export default function FinalAdmitcard({ params, onClose }) {
   const { studentID } = params; // StudentID
@@ -24,6 +26,33 @@ export default function FinalAdmitcard({ params, onClose }) {
   const [errorMessage, setErrorMessage] = useState(null);
 
   const noticeRef = useRef();
+  const [userId, setUserId] = useState(null);
+  const { user, error: authError, isLoading: userLoading } = useUser();
+
+
+
+  // Check user role and retrieve userId
+  useEffect(() => {
+    async function getUserRole() {
+      const email = user?.email; // Ensure user email is available
+      if (!email) return; // Prevent unnecessary fetch
+
+      try {
+        const result = await checkUserRole(email); // Use the imported function
+
+        if (result.exists) {
+          setUserId(result.userId); // Set userId from the response
+        } else {
+          setError("User not found or does not exist.");
+        }
+      } catch (error) {
+        console.error("Error fetching user role:", error);
+        setError("Failed to fetch user role.");
+      }
+    }
+
+    getUserRole();
+  }, [user]);
 
   // call api to fetch admicard bu studentID 
   useEffect(() => {
@@ -64,7 +93,7 @@ export default function FinalAdmitcard({ params, onClose }) {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const adminUsers = await fetchAdminUser();
+        const adminUsers = await fetchAdminUserByUserId(userId);
         console.log(adminUsers); // Fetch admin users
         setAdminUsers(adminUsers); // Store fetched admin users
       } catch (error) {
@@ -73,7 +102,7 @@ export default function FinalAdmitcard({ params, onClose }) {
     };
 
     fetchUsers(); // Call the fetch function
-  }, []); // Empty dependency array means it runs only once when the component mounts
+  }, [userId]); // Empty dependency array means it runs only once when the component mounts
   // use to download  admitcard 
   const downloadAdmitCard = async () => {
     const input = document.getElementById("admitCard");
@@ -131,10 +160,10 @@ export default function FinalAdmitcard({ params, onClose }) {
                   {/* Admit Card Info */}
 
                   <div className="flex flex-row gap-20">
-                    <Image src={adminUsers[0]?.picture} alt="Logo" className="h-[50px] w-[50px] rounded-full"
+                    <Image src={adminUsers?.picture} alt="Logo" className="h-[50px] w-[50px] rounded-full"
                       width={70} // Set width to avoid layout shift
                       height={70} />
-                    <h1 className="text-black text-lg font-bold">{adminUsers[0]?.name}</h1>
+                    <h1 className="text-black text-lg font-bold">{adminUsers?.name}</h1>
                   </div>
                   <div className="grid grid-cols-2 w-full gap-5">
                     {/* Left Column */}
@@ -204,11 +233,11 @@ export default function FinalAdmitcard({ params, onClose }) {
               >
 
                 <div className="flex flex-row gap-20">
-                  <Image src={adminUsers[0]?.picture} alt="Logo" className="h-[50px] w-[50px] rounded-full"
+                  <Image src={adminUsers?.picture} alt="Logo" className="h-[50px] w-[50px] rounded-full"
                     width={70} // Set width to avoid layout shift
                     height={70} />
                   <h1 className="text-black text-lg font-bold">
-                    {adminUsers[0]?.name}
+                    {adminUsers?.name}
                   </h1>
                 </div>
                 <div className="grid grid-cols-2 w-full gap-5">

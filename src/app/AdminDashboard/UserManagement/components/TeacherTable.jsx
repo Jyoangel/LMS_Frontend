@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { fetchTeacherData, deleteTeacherData } from "../../../../../api/teacherapi"; // api to fetch and delete teacher 
 import { format } from "date-fns";
+import { useUser } from '@auth0/nextjs-auth0/client'; // Import Auth0 client hook
 
 export default function TeacherManagementTable({ filter, searchTerm }) {
   const [data, setData] = useState({ teachers: [] });
@@ -11,6 +12,8 @@ export default function TeacherManagementTable({ filter, searchTerm }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [teacherToDelete, setTeacherToDelete] = useState(null);
+  // Get the authenticated user details from Auth0
+  const { user, error: authError, isLoading: userLoading } = useUser();
 
   const openDelete = (id) => {
     setTeacherToDelete(id);
@@ -36,7 +39,8 @@ export default function TeacherManagementTable({ filter, searchTerm }) {
   // use to call fetch teacher api 
   const loadItems = async () => {
     try {
-      const data = await fetchTeacherData();
+      const data = await fetchTeacherData(user.sub);
+      console.log("Teacherdata", data);
       setData(data);
       setLoading(false);
     } catch (error) {
@@ -46,8 +50,13 @@ export default function TeacherManagementTable({ filter, searchTerm }) {
   };
 
   useEffect(() => {
-    loadItems();
-  }, []);
+    if (!userLoading && !authError) {
+      loadItems(); // Load data only when user is authenticated
+    }
+  }, [user, userLoading, authError]); // Trigger loadItems when user is available
+
+  if (userLoading) return <div>Loading...</div>; // Show loading indicator while fetching user details
+  if (authError) return <div>{authError.message}</div>; // Handle authentication error
 
   const filteredData = data.teachers.filter(
     (item) =>

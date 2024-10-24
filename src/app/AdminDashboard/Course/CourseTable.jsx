@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { fetchCourseData, deleteCourseData } from "../../../../api/courseapi"; // api to fetch course and delete 
 import { format } from "date-fns";
+import { useUser } from '@auth0/nextjs-auth0/client'; // Import Auth0 client hook
 
 
 export default function CourseTable({ filter, searchTerm }) {
@@ -13,12 +14,13 @@ export default function CourseTable({ filter, searchTerm }) {
   const [error, setError] = useState(null);
   const [isDelete, setDelete] = useState(false);
   const [courseToDelete, setCourseToDelete] = useState(null);
-
+  // Get the authenticated user details from Auth0
+  const { user, error: authError, isLoading: userLoading } = useUser();
   // api to fetch course data 
   useEffect(() => {
     async function getData() {
       try {
-        const data = await fetchCourseData();
+        const data = await fetchCourseData(user.sub);
         setData(data);
         setIsLoading(false);
       } catch (error) {

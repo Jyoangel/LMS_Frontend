@@ -1,11 +1,16 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { FaArrowLeftLong } from "react-icons/fa6";
 import Successcard from "@/Components/Successcard";
-import { addExamData } from "../../../../../api/examapi"; // api to add exam data 
+import { addExamData } from "../../../../../api/examapi"; // API to add exam data
+import { checkUserRole } from "../../../../../api/teacherapi"; // Import checkUserRole function
+import { useUser } from '@auth0/nextjs-auth0/client';
+
 export default function ExamDetails() {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
+  const [userId, setUserId] = useState(null);
+  const { user, error: authError, isLoading: userLoading } = useUser();
   const [formData, setFormData] = useState({
     type: "",
     examTitle: "",
@@ -17,14 +22,78 @@ export default function ExamDetails() {
     instruction: "",
     totalMarks: "",
     passingMarks: "",
+    userId: "", // Initially set as an empty string
   });
+
   const [questionPaperFile, setQuestionPaperFile] = useState(null); // For handling file input
 
+
+  // Check user role and retrieve userId
+  useEffect(() => {
+    if (!user) return;
+    async function getUserRole() {
+      const email = user?.email; // Ensure user email is available
+      if (!email) return; // Prevent unnecessary fetch
+
+      try {
+        const result = await checkUserRole(email); // Use the imported function
+
+        if (result.exists) {
+          setUserId(result.userId); // Set userId from the response
+        } else {
+          console.error("User not found or does not exist.");
+        }
+      } catch (error) {
+        console.error("Error fetching user role:", error);
+      }
+    }
+
+    getUserRole();
+  }, [user]);
+
+  // Update formData with userId when userId is fetched
+  useEffect(() => {
+    if (userId) {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        userId: userId,
+      }));
+    }
+  }, [userId]);
+  // Handle form input changes and update state
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
+
+    // Update formData state
+    setFormData((prevData) => {
+      const updatedData = {
+        ...prevData,
+        [name]: value, // Update the specific form field with its new value
+      };
+
+      // Calculate the duration if startTime and endTime are available
+      if (name === 'startTime' || name === 'endTime') {
+        const { startTime, endTime } = updatedData;
+
+        if (startTime && endTime) {
+          const start = new Date(`1970-01-01T${startTime}:00`);
+          const end = new Date(`1970-01-01T${endTime}:00`);
+
+          if (end > start) {
+            const diffMs = end - start; // Difference in milliseconds
+            const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+            const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+
+            updatedData.duration = `${diffHours}h ${diffMinutes}m`;
+          } else {
+            updatedData.duration = '';
+          }
+        } else {
+          updatedData.duration = '';
+        }
+      }
+
+      return updatedData;
     });
   };
 
@@ -33,17 +102,22 @@ export default function ExamDetails() {
     setQuestionPaperFile(e.target.files[0]); // Get the first selected file
   };
 
-
-  // use to submit and call api to add exam data 
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     // Basic validation
     for (const key in formData) {
-      if (formData[key] === "") {
+      if (formData[key] === "" && key !== 'duration') {
         alert(`Please fill out the ${key.replace(/([A-Z])/g, ' $1').toLowerCase()}.`);
         return;
       }
+    }
+
+    // Ensure the end time is later than the start time
+    if (new Date(`${formData.date}T${formData.endTime}`) <= new Date(`${formData.date}T${formData.startTime}`)) {
+      alert('End time must be later than start time.');
+      return; // Stop form submission if time validation fails
     }
 
     // Create a FormData object to include the file and form fields
@@ -51,18 +125,30 @@ export default function ExamDetails() {
     Object.keys(formData).forEach((key) => {
       examData.append(key, formData[key]);
     });
+
     if (questionPaperFile) {
       examData.append("uploadQuestionPaper", questionPaperFile); // Append the file
     }
 
+    // // Include userId in the form data
+    // if (userId) {
+    //   examData.set("userId", userId); // Set the userId if available
+    // } else {
+    //   alert('User ID not set. Please make sure you are logged in.');
+    //   return;
+    // }
+
     try {
       await addExamData(examData); // Send the FormData object
-      setIsSelectOpen(true);
+      setIsSelectOpen(true); // Show success modal
     } catch (error) {
       console.error("Failed to add exam data:", error);
       alert('Failed to add exam data. Please try again.');
     }
   };
+
+
+
   return (
     <>
       <div className="h-screen w-full flex flex-col px-5 py-10 gap-10">
@@ -132,7 +218,7 @@ export default function ExamDetails() {
                 <label htmlFor="startTime" className="text-lg font-normal text-black">Start Time*</label>
                 <input
                   id="startTime"
-                  type="text"
+                  type="time"
                   name="startTime"
                   value={formData.startTime}
                   onChange={handleChange}
@@ -140,11 +226,11 @@ export default function ExamDetails() {
                 />
               </div>
               <div className="flex flex-col gap-3 w-full">
-                <label htmlFor="startTime" className="text-lg font-normal text-black">End Time*</label>
+                <label htmlFor="endTime" className="text-lg font-normal text-black">End Time*</label>
                 <input
-                  id="startTime"
-                  type="text"
-                  name="startTime"
+                  id="endTime"
+                  type="time"
+                  name="endTime"
                   value={formData.endTime}
                   onChange={handleChange}
                   className="border border-gray-300 bg-gray-200 rounded-md w-full py-3 px-5 outline-none"

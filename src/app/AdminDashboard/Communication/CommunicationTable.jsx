@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { fetchStudentData, selectStudent } from "../../../../api/api"; // Replace with your actual API functions
 import { format } from "date-fns";
+import { useUser } from '@auth0/nextjs-auth0/client'; // Import Auth0 client hook
 
 export default function CommunicationTable({ filter, searchTerm, setSelectedStudent }) {
   const [data, setData] = useState({ students: [] });
@@ -13,12 +14,13 @@ export default function CommunicationTable({ filter, searchTerm, setSelectedStud
   const [error, setError] = useState(null);
 
   const [selectAll, setSelectAll] = useState(false);
-
+  // Get the authenticated user details from Auth0
+  const { user, error: authError, isLoading: userLoading } = useUser();
 
 
   const loadItems = async () => {
     try {
-      const data = await fetchStudentData();
+      const data = await fetchStudentData(user.sub);
       setData(data);
       setLoading(false);
     } catch (error) {
@@ -28,8 +30,14 @@ export default function CommunicationTable({ filter, searchTerm, setSelectedStud
   };
 
   useEffect(() => {
-    loadItems();
-  }, []);
+    if (!userLoading && !authError) {
+      loadItems(); // Load data only when user is authenticated
+    }
+  }, [user, userLoading, authError]); // Trigger loadItems when user is available
+
+  if (userLoading) return <div>Loading...</div>; // Show loading indicator while fetching user details
+  if (authError) return <div>{authError.message}</div>; // Handle authentication error
+
 
   const filteredData = data.students.filter(
     (item) =>

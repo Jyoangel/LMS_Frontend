@@ -4,21 +4,49 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { fetchClassScheduleByClass } from "../../../../api/classScheduleapi"; // Fetch API
+import { checkUserRole } from "../../../../api/teacherapi"; // Import checkUserRole function
+import { useUser } from '@auth0/nextjs-auth0/client';
 
 const Timetable = () => {
   const [scheduleData, setScheduleData] = useState([]);
   const [visibleCells, setVisibleCells] = useState({});
   const [selectedClass, setSelectedClass] = useState(""); // State to store the selected class
+  const [userId, setUserId] = useState(null);
+  const { user, error: authError, isLoading: userLoading } = useUser();
 
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   const periods = [1, 2, 3, 4, 5, 6, 7, 8];
+
+
+  // Check user role and retrieve userId
+  useEffect(() => {
+    async function getUserRole() {
+      const email = user?.email; // Ensure user email is available
+      if (!email) return; // Prevent unnecessary fetch
+
+      try {
+        const result = await checkUserRole(email); // Use the imported function
+
+        if (result.exists) {
+          setUserId(result.userId); // Set userId from the response
+        } else {
+          setError("User not found or does not exist.");
+        }
+      } catch (error) {
+        console.error("Error fetching user role:", error);
+        setError("Failed to fetch user role.");
+      }
+    }
+
+    getUserRole();
+  }, [user]);
 
   // Call API to fetch the class schedule data based on selected class
   useEffect(() => {
     if (selectedClass) {
       const fetchData = async () => {
         try {
-          const data = await fetchClassScheduleByClass(selectedClass);
+          const data = await fetchClassScheduleByClass(selectedClass, userId);
           console.log("Fetched Schedule Data:", data); // Debugging log
           setScheduleData(data);
         } catch (error) {
@@ -27,7 +55,7 @@ const Timetable = () => {
       };
       fetchData();
     }
-  }, [selectedClass]);
+  }, [selectedClass, userId]);
 
   const handleCellClick = (day, period) => {
     setVisibleCells((prevState) => ({

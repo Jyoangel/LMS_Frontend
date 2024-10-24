@@ -1,7 +1,7 @@
 // fetch Report card data
 
-export async function fetchReportCardData() {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/reportcard/get`);
+export async function fetchReportCardData(userId) {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/reportcard/get?userId=${userId}`);
 
     if (!res.ok) {
         throw new Error('Failed to fetch data');

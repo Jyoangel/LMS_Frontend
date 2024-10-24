@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { fetchStaffData } from "../../../../api/staffapi";// fetch staff api
 import { format } from "date-fns";
 import Payment from "./StaffPayment/[staffId]/page";
+import { useUser } from '@auth0/nextjs-auth0/client'; // Import Auth0 client hook
 
 export default function StaffPaymentTable({ filter, searchTerm }) {
     const [data, setData] = useState({ staff: [] });
@@ -13,7 +14,7 @@ export default function StaffPaymentTable({ filter, searchTerm }) {
     const [selectedStaffId, setSelectedStaffId] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
+    const { user, error: authError, isLoading: userLoading } = useUser();
 
     const openNotice = (staffId) => {
         setSelectedStaffId(staffId);
@@ -30,7 +31,7 @@ export default function StaffPaymentTable({ filter, searchTerm }) {
         try {
 
             // call api to fetch staff data 
-            const data = await fetchStaffData();
+            const data = await fetchStaffData(user.sub);
             setData(data);
             setLoading(false);
         } catch (error) {
@@ -40,8 +41,13 @@ export default function StaffPaymentTable({ filter, searchTerm }) {
     };
 
     useEffect(() => {
-        loadItems();
-    }, []);
+        if (!userLoading && !authError) {
+            loadItems(); // Load data only when user is authenticated
+        }
+    }, [user, userLoading, authError]); // Trigger loadItems when user is available
+
+    if (userLoading) return <div>Loading...</div>; // Show loading indicator while fetching user details
+    if (authError) return <div>{authError.message}</div>; // Handle authentication error
 
     const filteredData = data.staff.filter(
         (item) =>

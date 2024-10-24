@@ -2,6 +2,7 @@
 // src/components/TeacherTable.js
 import React, { useEffect, useState } from 'react';
 import { fetchTeacherData } from "../../../../../api/teacherapi"
+import { useUser } from '@auth0/nextjs-auth0/client';
 
 
 
@@ -10,11 +11,12 @@ export default function TeacherTable() {
   const [paymentList, setPaymentList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { user } = useUser();
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const data = await fetchTeacherData();
+        const data = await fetchTeacherData(user.sub);
         setTeacherList(data.teachers || []);
 
       } catch (err) {

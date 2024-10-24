@@ -7,17 +7,47 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { fetchExamData, deleteExamData } from "../../../../api/examapi"; // api to fetch and delete exam data 
 import { format } from "date-fns";
+import { checkUserRole } from "../../../../api/teacherapi"; // Import checkUserRole function
+import { useUser } from '@auth0/nextjs-auth0/client';
 
 export default function ExamTable({ filter, searchTerm }) {
   const [examData, setExamData] = useState([]);
   const [isDelete, setDelete] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
+  const [userId, setUserId] = useState(null);
+  const { user, error: authError, isLoading: userLoading } = useUser();
 
+
+
+  // Check user role and retrieve userId
+  useEffect(() => {
+    if (!user) return;
+    async function getUserRole() {
+      const email = user?.email; // Ensure user email is available
+      if (!email) return; // Prevent unnecessary fetch
+
+      try {
+        const result = await checkUserRole(email); // Use the imported function
+
+        if (result.exists) {
+          setUserId(result.userId); // Set userId from the response
+        } else {
+          setError("User not found or does not exist.");
+        }
+      } catch (error) {
+        console.error("Error fetching user role:", error);
+        setError("Failed to fetch user role.");
+      }
+    }
+
+    getUserRole();
+  }, [user]);
   // call api to fetch exam data 
   useEffect(() => {
+    if (!userId) return;
     const loadExamData = async () => {
       try {
-        const data = await fetchExamData();
+        const data = await fetchExamData(userId);
         setExamData(data.exams);
       } catch (error) {
         console.error("Failed to fetch exam data:", error);
@@ -26,7 +56,7 @@ export default function ExamTable({ filter, searchTerm }) {
     };
 
     loadExamData();
-  }, []);
+  }, [userId]);
 
   const openDelete = (id) => {
     setDeleteId(id);

@@ -8,18 +8,19 @@ import { CiSearch } from "react-icons/ci";
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa6";
 import { SlRefresh } from "react-icons/sl";
 import HotelTable from "./HotelTable";
-import { fetchHotelData } from "../../../../api/hotelapi"; // api to fetch hostel count  
+import { fetchCountData } from "../../../../api/api"; // api to fetch hostel count
+import { useUser } from '@auth0/nextjs-auth0/client'; // Import Auth0 client hook  
 
 export default function HotelManagement() {
   const [filter, setFilter] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [totalCourses, setTotalCourses] = useState(0);
-
+  const { user, error: authError, isLoading: userLoading } = useUser();
   // use to fetch hostel count 
   useEffect(() => {
     const getData = async () => {
       try {
-        const data = await fetchHotelData();
+        const data = await fetchCountData(user.sub);
         // Update your component state with data
         setTotalCourses(data.count);
       } catch (error) {

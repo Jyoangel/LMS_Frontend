@@ -3,16 +3,45 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { fetchStudentData } from "../../../../api/api"; //api to fetch student data 
 import { format } from "date-fns";
+import { checkUserRole } from "../../../../api/teacherapi"; // Import checkUserRole function
+import { useUser } from '@auth0/nextjs-auth0/client';
 
 export default function StudentTable() {
   const [studentData, setStudentData] = useState([]);
   const [accessProvided, setAccessProvided] = useState([]);
-
+  const [userId, setUserId] = useState(null);
+  const { user, error: authError, isLoading: userLoading } = useUser();
   // call api to fetch student data 
+
+  // Check user role and retrieve userId
   useEffect(() => {
+    if (!user) return;
+    async function getUserRole() {
+      const email = user?.email; // Ensure user email is available
+      if (!email) return; // Prevent unnecessary fetch
+
+      try {
+        const result = await checkUserRole(email);
+        console.log(result); // Use the imported function
+
+        if (result.exists) {
+          setUserId(result.userId); // Set userId from the response
+        } else {
+          setError("User not found or does not exist.");
+        }
+      } catch (error) {
+        console.error("Error fetching user role:", error);
+        setError("Failed to fetch user role.");
+      }
+    }
+
+    getUserRole();
+  }, [user]);
+  useEffect(() => {
+    if (!userId) return;
     async function loadStudentData() {
       try {
-        const data = await fetchStudentData();
+        const data = await fetchStudentData(userId);
         if (data && Array.isArray(data.students)) {
           setStudentData(data.students);
           setAccessProvided(Array(data.students.length).fill(false));
@@ -25,7 +54,7 @@ export default function StudentTable() {
     }
 
     loadStudentData();
-  }, []);
+  }, [userId]);
 
   const handleCheckboxChange = (index) => {
     const newAccessProvided = [...accessProvided];

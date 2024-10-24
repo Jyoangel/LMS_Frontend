@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { fetchTeacherData, selectTeacher } from "../../../../api/teacherapi"; // Assuming selectTeacher is in teacherapi
 import { format } from "date-fns";
+import { useUser } from '@auth0/nextjs-auth0/client'; // Import Auth0 client hook
 
 export default function TeacherManagementTable({ filter, searchTerm, setSelectedTeacher }) {
   const [data, setData] = useState({ teachers: [] });
@@ -11,9 +12,12 @@ export default function TeacherManagementTable({ filter, searchTerm, setSelected
   const [error, setError] = useState(null);
   const [selectAll, setSelectAll] = useState(false);
 
+  // Get the authenticated user details from Auth0
+  const { user, error: authError, isLoading: userLoading } = useUser();
+
   const loadItems = async () => {
     try {
-      const data = await fetchTeacherData();
+      const data = await fetchTeacherData(user.sub);
       setData(data);
       setLoading(false);
     } catch (error) {
@@ -23,8 +27,13 @@ export default function TeacherManagementTable({ filter, searchTerm, setSelected
   };
 
   useEffect(() => {
-    loadItems();
-  }, []);
+    if (!userLoading && !authError) {
+      loadItems(); // Load data only when user is authenticated
+    }
+  }, [user, userLoading, authError]); // Trigger loadItems when user is available
+
+  if (userLoading) return <div>Loading...</div>; // Show loading indicator while fetching user details
+  if (authError) return <div>{authError.message}</div>; // Handle authentication error
 
   const filteredData = data.teachers.filter(
     (item) =>

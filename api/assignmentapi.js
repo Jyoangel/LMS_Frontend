@@ -1,7 +1,7 @@
 //fetch all assignmenet data
 
-export async function fetchAssignmentData() {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/assignment/get`);
+export async function fetchAssignmentData(userId) {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/assignment/get?userId=${userId}`);
 
     if (!res.ok) {
         throw new Error('Failed to fetch data');

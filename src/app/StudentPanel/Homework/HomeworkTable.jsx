@@ -6,17 +6,45 @@ import Image from "next/image";
 import download from "./download.png";
 import { fetchHomeWorkData, } from "../../../../api/homeworkapi"; // api to fetch homework data 
 import { format } from "date-fns";
+import { checkUserRole } from "../../../../api/api"; // Import checkUserRole function
+import { useUser } from '@auth0/nextjs-auth0/client';
 
 
 
 export default function HomeworkTable({ filter, searchTerm }) {
   const [homeworkData, setHomeworkData] = useState([]);
+  const [userId, setUserId] = useState(null);
+  const { user, error: authError, isLoading: userLoading } = useUser();
+
+  useEffect(() => {
+    if (!user) return;
+    async function getUserRole() {
+      const email = user?.email; // Ensure user email is available
+      if (!email) return; // Prevent unnecessary fetch
+
+      try {
+        const result = await checkUserRole(email); // Use the imported function
+
+        if (result.exists) {
+          setUserId(result.userId); // Set userId from the response
+        } else {
+          setError("User not found or does not exist.");
+        }
+      } catch (error) {
+        console.error("Error fetching user role:", error);
+        setError("Failed to fetch user role.");
+      }
+    }
+
+    getUserRole();
+  }, [user]);
 
   // call api to fetch homework data 
   useEffect(() => {
+    if (!userId) return;
     const loadData = async () => {
       try {
-        const data = await fetchHomeWorkData();
+        const data = await fetchHomeWorkData(userId);
         setHomeworkData(data.homeworks);
       } catch (error) {
         console.error("Error fetching homework data:", error);
@@ -24,7 +52,7 @@ export default function HomeworkTable({ filter, searchTerm }) {
     };
 
     loadData();
-  }, []);
+  }, [userId]);
 
 
 
@@ -73,7 +101,7 @@ export default function HomeworkTable({ filter, searchTerm }) {
                 <td className="py-4 px-6 text-left">Kamlesh Kumar</td>
                 <td className="py-4 px-6 text-left">{item.attachments}</td>
                 <td className="py-4 px-6 text-left flex gap-2">
-                  <Link href={`http://localhost:5000/api/homework/${item.uploadHomework}`} target="_blank">
+                  <Link href={`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/homework/${item.uploadHomework}`} target="_blank">
 
                     <Image src={download} alt="download" />
                   </Link>

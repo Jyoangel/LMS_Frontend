@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { fetchStudentData } from "../../../../api/api"; // fetch student api 
 import { fetchTranspotationBystudentID, deleteTranspotationDataByStudentID } from "../../../../api/transpotationapi"; // Import your fetch and delete api of transportation 
+import { useUser } from '@auth0/nextjs-auth0/client'; // Import Auth0 client hook
+
 
 export default function TranspotationTable({ filter, searchTerm }) {
   const [transpotationData, setTranspotationData] = useState([]);
@@ -11,12 +13,13 @@ export default function TranspotationTable({ filter, searchTerm }) {
   const [deleteId, setDeleteId] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { user, error: authError, isLoading: userLoading } = useUser();
 
   // use to fetch student data with transportation data 
   useEffect(() => {
     async function getData() {
       try {
-        const data = await fetchStudentData();
+        const data = await fetchStudentData(user.sub);
         const students = data.students;
 
         // Fetch transportation data for each student

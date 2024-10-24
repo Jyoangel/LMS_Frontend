@@ -9,6 +9,8 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { fetchCourseData, deleteCourseData } from "../../../../api/courseapi"; // api to fetch course  and delete 
 import { format } from "date-fns";
+import { checkUserRole } from "../../../../api/api"; // Import checkUserRole function
+import { useUser } from '@auth0/nextjs-auth0/client';
 
 export default function CourseTable({ filter, searchTerm }) {
   const [data, setData] = useState({ courses: [] });
@@ -16,12 +18,41 @@ export default function CourseTable({ filter, searchTerm }) {
   const [error, setError] = useState(null);
   const [isDelete, setDelete] = useState(false);
   const [courseToDelete, setCourseToDelete] = useState(null);
+  const [userId, setUserId] = useState(null);
+  const { user, error: authError, isLoading: userLoading } = useUser();
+  // Fetch  library data on component mount
+
+  // Check user role and retrieve userId
+  useEffect(() => {
+    if (!user) return;
+    async function getUserRole() {
+      const email = user?.email; // Ensure user email is available
+      if (!email) return; // Prevent unnecessary fetch
+
+      try {
+        const result = await checkUserRole(email); // Use the imported function
+
+        if (result.exists) {
+          setUserId(result.userId); // Set userId from the response
+        } else {
+          setError("User not found or does not exist.");
+        }
+      } catch (error) {
+        console.error("Error fetching user role:", error);
+        setError("Failed to fetch user role.");
+      }
+    }
+
+    getUserRole();
+  }, [user]);
+
 
   // call api to fetch the course data 
   useEffect(() => {
+    if (!userId) return;
     async function getData() {
       try {
-        const data = await fetchCourseData();
+        const data = await fetchCourseData(userId);
         setData(data); // set course data 
         setIsLoading(false);
       } catch (error) {
@@ -31,7 +62,7 @@ export default function CourseTable({ filter, searchTerm }) {
     }
 
     getData();
-  }, []);
+  }, [userId]);
 
   const openDelete = (courseId) => {
     setCourseToDelete(courseId);

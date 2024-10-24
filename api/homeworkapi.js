@@ -1,7 +1,7 @@
 // fetch Homework data
 
-export async function fetchHomeWorkData() {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/homework/get`);
+export async function fetchHomeWorkData(userId) {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/homework/get?userId=${userId}`);
 
     if (!res.ok) {
         throw new Error('Failed to fetch data');

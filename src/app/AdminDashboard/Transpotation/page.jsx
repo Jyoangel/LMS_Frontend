@@ -6,18 +6,20 @@ import { CiSearch } from "react-icons/ci";
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa6";
 import { SlRefresh } from "react-icons/sl";
 import TranspotationTable from "./TranspotationTable";
-import { fetchTranspotationData } from "../../../../api/transpotationapi"; // api to fetch transportation count 
+import { fetchCountData } from "../../../../api/api"; // api to fetch transportation count 
+import { useUser } from '@auth0/nextjs-auth0/client'; // Import Auth0 client hook
 
 export default function LibraryManage() {
   const [filter, setFilter] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [totalCourses, setTotalCourses] = useState(0);
-
+  // Get the authenticated user details from Auth0
+  const { user, error: authError, isLoading: userLoading } = useUser();
   // use to fetch transportation count 
   useEffect(() => {
     const getData = async () => {
       try {
-        const data = await fetchTranspotationData();
+        const data = await fetchCountData(user.sub);
         // Update your component state with data
         setTotalCourses(data.count);
       } catch (error) {
@@ -33,7 +35,7 @@ export default function LibraryManage() {
       <div className="h-screen w-full flex flex-col gap-6 p-5">
         {/* total no */}
         <div className="w-full flex items-center justify-between">
-          <h1 className="text-base font-medium">Total Transportation: {totalCourses}</h1>
+          <h1 className="text-base font-medium">Total Student: {totalCourses}</h1>
           <div className="flex items-center justify-center gap-5">
             <Link href={"/AdminDashboard/Transpotation/AddTranspotation"}>
               <button className="text-base font-semibold text-white bg-blue-500 px-4 py-2 rounded-lg">

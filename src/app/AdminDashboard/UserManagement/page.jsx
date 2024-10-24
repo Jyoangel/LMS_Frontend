@@ -15,6 +15,7 @@ import { fetchCountStaffData } from "../../../../api/staffapi";// api to fetch s
 import { importStudentData } from "../../../../api/api"; // api to import student 
 import { importTeacherData } from "../../../../api/teacherapi"; // api to import teacher 
 import { importStaffData } from "../../../../api/staffapi"; // api to import staff 
+import { useUser } from '@auth0/nextjs-auth0/client'; // Import Auth0 client hook
 
 export default function UserManagement() {
   const [filter, setFilter] = useState("");
@@ -26,7 +27,8 @@ export default function UserManagement() {
 
   // Reference for the file input element
   const fileInputRef = useRef(null);
-
+  // Get the authenticated user details from Auth0
+  const { user, error: authError, isLoading: userLoading } = useUser();
   // use to call fetch count api for teacher ,student and staff 
   const handleSelect = async (value) => {
     setSelect(value);
@@ -40,7 +42,7 @@ export default function UserManagement() {
     }
 
     try {
-      const data = await fetchData();
+      const data = await fetchData(user.sub);
       setTotalUsers(data.count);
     } catch (error) {
       console.error("Failed to fetch data:", error);

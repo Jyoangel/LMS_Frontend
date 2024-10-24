@@ -1,7 +1,7 @@
 // fetch staff data 
 
-export async function fetchStaffData() {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/staff/get`);
+export async function fetchStaffData(userId) {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/staff/get?userId=${userId}`);
 
     if (!res.ok) {
         throw new Error('Failed to fetch data');
@@ -18,7 +18,10 @@ export async function addStaffData(staffData) {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(staffData),
+            body: JSON.stringify({
+                ...staffData,
+                userId: encodeURIComponent(staffData.userId), // URL-encode the userId to handle special characters
+            }),
         });
 
         // Check if the server response is not OK (status code is not in the range of 200-299)
@@ -92,8 +95,8 @@ export async function deleteStaffData(id) {
 
 
 // fetch count staff data 
-export async function fetchCountStaffData() {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/staff/staff-count`);
+export async function fetchCountStaffData(userId) {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/staff/staff-count?userId=${userId}`);
 
     if (!res.ok) {
         throw new Error('Failed to fetch data');
@@ -101,6 +104,7 @@ export async function fetchCountStaffData() {
 
     return res.json();
 }
+
 
 //Payment
 

@@ -22,7 +22,7 @@ export default function FeeDetails({ params }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
-  const [feeSlipData, setFeeSlipData] = useState({}); // Store fee slips as an object by month
+  const [feeSlipData, setFeeSlipData] = useState([]); // Store fee slips as an object by month
   const [availableMonths, setAvailableMonths] = useState([]);
   const [selectedSlip, setSelectedSlip] = useState(null); // Store selected slip for modal
 
@@ -33,6 +33,7 @@ export default function FeeDetails({ params }) {
 
         try {
           const data = await fetchStudentByID(studentID);
+
           setStudentData(data);
 
           // Initialize an object to hold fee slips for each month
@@ -42,19 +43,19 @@ export default function FeeDetails({ params }) {
             months.map(async (month) => {
               try {
                 const feeData = await fetchFeeRecordByMonth(studentID, month);
-                if (feeData && feeData.length > 0) {
-                  feeSlipsByMonth[month] = feeData; // Store fee data by month
-                } else {
-                  feeSlipsByMonth[month] = []; // Set empty array if no fee slips
-                }
+                console.log(`Fee data for ${month}:`, feeData);
+                console.log("fee data length", feeData.length);
+                // Store fee data by month, ensuring arrays are initialized correctly
+                feeSlipsByMonth[month] = feeData;
               } catch (error) {
                 console.error(`Error fetching fee data for ${month}:`, error);
                 feeSlipsByMonth[month] = []; // Ensure an empty array is set on error
               }
             })
           );
+          setFeeSlipData(feeSlipsByMonth);
 
-          setFeeSlipData(feeSlipsByMonth); // Update state with the structured data
+          // Update state with the structured data
         } catch (error) {
           setError(error.message);
         } finally {
@@ -75,14 +76,14 @@ export default function FeeDetails({ params }) {
     setIsNoticeOpen(false);
   };
 
-  const handleMonthClick = async (month) => {
-    try {
-      const feeData = await fetchFeeRecordByMonth(studentID, month);
-      setFeeSlipData((prev) => ({ ...prev, [month]: feeData })); // Store fee data by month
-    } catch (error) {
-      console.error('Error fetching fee slip for the month:', error);
-    }
-  };
+  // const handleMonthClick = async (month) => {
+  //   try {
+  //     const feeData = await fetchFeeRecordByMonth(studentID, month);
+  //     setFeeSlipData((prev) => ({ ...prev, [month]: feeData })); // Store fee data by month
+  //   } catch (error) {
+  //     console.error('Error fetching fee slip for the month:', error);
+  //   }
+  // };
 
   const openSlip = (slip) => {
     console.log('Selected Slip:', slip);
@@ -92,7 +93,7 @@ export default function FeeDetails({ params }) {
   const closeSlip = () => {
     setSelectedSlip(null);
   };
-  console.log("feeSlipData:", feeSlipData);
+  console.log("feeSlipDataaaa:", feeSlipData);
   console.log("months:", months);
   if (!feeSlipData) {
     return <div>Loading...</div>;
@@ -210,24 +211,32 @@ export default function FeeDetails({ params }) {
                 <tbody>
                   <tr>
                     {months.map((month) => (
-                      <td key={month} className="border border-gray-300 p-2 text-center">
-                        {feeSlipData[month] && feeSlipData[month].length > 0 ? (
-                          [...feeSlipData[month]].reverse().map((slip) => (
-                            <div key={slip._id} className="mt-1">
-                              <button
-                                className="text-blue-500 underline"
-                                onClick={() => openSlip(slip)}
-                              >
-                                View Slip
-                              </button>
-                            </div>
-                          ))
-                        ) : (
-                          <span className="text-gray-400">N/A</span>
-                        )}
-                      </td>
-                    ))}
-                  </tr>
+                      <>
+                        {//console.log("feeSlipData", feeSlipData[month])
+                          console.log("feeSlipDatalength", feeSlipData[month].length)}
+                        {console.log("months", month)}
+
+                        <td key={month} className="border border-gray-300 p-2 text-center">
+                          {feeSlipData[month] && feeSlipData[month].length > 0 ? (
+                            [...feeSlipData[month]].reverse().map((slip) => (
+                              console.log("Slip", slip),
+
+                              <div key={slip._id} className="mt-1">
+                                <button
+                                  className="text-blue-500 underline"
+                                  onClick={() => openSlip(slip)}
+                                >
+                                  View Slip
+                                </button>
+                              </div>
+                            ))
+                          ) : (
+                            <span className="text-gray-400">N/A</span>
+                          )}
+                        </td>
+                      </>))}
+
+                  </tr >
                 </tbody>
               </table>
             </div>

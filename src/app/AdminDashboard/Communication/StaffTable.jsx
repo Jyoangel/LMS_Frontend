@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { fetchStaffData, selectStaff } from "../../../../api/staffapi"; // Assuming selectStaff is in staffapi
 import { format } from "date-fns";
+import { useUser } from '@auth0/nextjs-auth0/client'; // Import Auth0 client hook
 
 export default function StaffManagementTable({ filter, searchTerm, setSelectedStaff }) {
   const [data, setData] = useState({ staff: [] });
@@ -11,9 +12,12 @@ export default function StaffManagementTable({ filter, searchTerm, setSelectedSt
   const [error, setError] = useState(null);
   const [selectAll, setSelectAll] = useState(false);
 
+  // Get the authenticated user details from Auth0
+  const { user, error: authError, isLoading: userLoading } = useUser();
+
   const loadItems = async () => {
     try {
-      const data = await fetchStaffData();
+      const data = await fetchStaffData(user.sub);
       setData(data);
       setLoading(false);
     } catch (error) {
@@ -23,8 +27,13 @@ export default function StaffManagementTable({ filter, searchTerm, setSelectedSt
   };
 
   useEffect(() => {
-    loadItems();
-  }, []);
+    if (!userLoading && !authError) {
+      loadItems(); // Load data only when user is authenticated
+    }
+  }, [user, userLoading, authError]); // Trigger loadItems when user is available
+
+  if (userLoading) return <div>Loading...</div>; // Show loading indicator while fetching user details
+  if (authError) return <div>{authError.message}</div>; // Handle authentication error
 
   const filteredData = data.staff.filter(
     (item) =>

@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { fetchStudentData } from '../../../../../api/api';
+import { useUser } from '@auth0/nextjs-auth0/client';
+
 
 export default function StudentTable() {
   const [studentList, setStudentList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { user } = useUser();
 
   useEffect(() => {
     async function loadFeeData() {
       try {
-        const response = await fetchStudentData();
+        const response = await fetchStudentData(user.sub);
         console.log("API Response:", response); // Log to verify the structure
         // Adjust this based on actual structure, e.g., response.data if the array is in a data property
 

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import ConfirmationCard from "@/Components/ConfirmationCard";
 import { fetchEnquiryData, deleteEnquiryData } from "../../../../api/enquiryapi"; // fetch and delete enquiry data 
+import { useUser } from '@auth0/nextjs-auth0/client';
 
 export default function EnquiryTable({ filter, searchTerm }) {
   const [enquiryData, setEnquiryData] = useState([]);
@@ -11,13 +12,14 @@ export default function EnquiryTable({ filter, searchTerm }) {
   const [deleteId, setDeleteId] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { user } = useUser();
 
 
   // use to fetch all enquiry data 
   useEffect(() => {
     const loadEnquiryData = async () => {
       try {
-        const data = await fetchEnquiryData();
+        const data = await fetchEnquiryData(user.sub);
         setEnquiryData(data.enquiries);
         setIsLoading(false);
       } catch (error) {

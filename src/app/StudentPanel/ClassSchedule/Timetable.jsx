@@ -1,5 +1,4 @@
-// components/Timetable.js
-"use client";
+
 // components/Timetable.js
 "use client";
 
@@ -7,11 +6,37 @@ import React, { useEffect, useState } from "react";
 import { fetchClassScheduleByClass } from "../../../../api/classScheduleapi"; // api to fetch the class schedule
 import { useUser } from "@auth0/nextjs-auth0/client"; // Assuming you are using Auth0
 import { fetchStudentByEmail } from "../../../../api/api"; // API to fetch student data by email
+import { checkUserRole } from "../../../../api/api"; // Import checkUserRole function
 
 const Timetable = () => {
   const [scheduleData, setScheduleData] = useState([]);
   const [studentClass, setStudentClass] = useState(null);
   const { user, isLoading } = useUser(); // Get user information from Auth0
+  const [userId, setUserId] = useState(null);
+
+  // Check user role and retrieve userId
+  useEffect(() => {
+    if (!user) return;
+    async function getUserRole() {
+      const email = user?.email; // Ensure user email is available
+      if (!email) return; // Prevent unnecessary fetch
+
+      try {
+        const result = await checkUserRole(email); // Use the imported function
+
+        if (result.exists) {
+          setUserId(result.userId); // Set userId from the response
+        } else {
+          setError("User not found or does not exist.");
+        }
+      } catch (error) {
+        console.error("Error fetching user role:", error);
+        setError("Failed to fetch user role.");
+      }
+    }
+
+    getUserRole();
+  }, [user]);
 
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   const periods = [1, 2, 3, 4, 5, 6, 7, 8];
@@ -29,7 +54,7 @@ const Timetable = () => {
             setStudentClass(studentData.class);
 
             // Fetch class schedule data using the student's class
-            const scheduleData = await fetchClassScheduleByClass(studentData.class);
+            const scheduleData = await fetchClassScheduleByClass(studentData.class, userId);
             console.log("Fetched Schedule Data:", scheduleData); // Debugging log
             setScheduleData(scheduleData);
           }
@@ -39,7 +64,7 @@ const Timetable = () => {
       }
     };
     fetchData();
-  }, [user, isLoading]);
+  }, [user, userId, isLoading]);
 
   const renderCell = (day, period) => {
     const entry = scheduleData.find(

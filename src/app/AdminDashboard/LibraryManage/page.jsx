@@ -7,18 +7,20 @@ import { FaAngleLeft, FaAngleRight } from "react-icons/fa6";
 import { SlRefresh } from "react-icons/sl";
 import LibraryTable from "./LibraryTable";
 import { fetchLibraryData } from "../../../../api/libraryapi"; // fetch api library count  
+import { useUser } from '@auth0/nextjs-auth0/client';
 
 export default function LibraryManage() {
   const [filter, setFilter] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [totalCourses, setTotalCourses] = useState(0);
+  const { user, error, isLoading } = useUser();
 
 
   // use to fetch library count 
   useEffect(() => {
     const getData = async () => {
       try {
-        const data = await fetchLibraryData();
+        const data = await fetchLibraryData(user.sub);
         // Update your component state with data
         setTotalCourses(data.count);
       } catch (error) {

@@ -2,12 +2,40 @@
 
 import Successcard from "@/Components/Successcard";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaArrowLeftLong } from "react-icons/fa6";
 import { addCourseData } from "../../../../../api/courseapi"; // api to add course data 
+import { checkUserRole } from "../../../../../api/teacherapi"; // Import checkUserRole function
+import { useUser } from '@auth0/nextjs-auth0/client';
 
 export default function CourseDetail() {
   const [isSelectOpen, setisSelectOpen] = useState(false);
+  const [userId, setUserId] = useState(null);
+  const { user, error: authError, isLoading: userLoading } = useUser();
+
+  // Check user role and retrieve userId
+  useEffect(() => {
+    async function getUserRole() {
+      const email = user?.email; // Ensure user email is available
+      if (!email) return; // Prevent unnecessary fetch
+
+      try {
+        const result = await checkUserRole(email); // Use the imported function
+
+        if (result.exists) {
+          setUserId(result.userId); // Set userId from the response
+        } else {
+          setError("User not found or does not exist.");
+        }
+      } catch (error) {
+        console.error("Error fetching user role:", error);
+        setError("Failed to fetch user role.");
+      }
+    }
+
+    getUserRole();
+  }, [user]);
+
   const [courseData, setCourseData] = useState({
     courseName: '',
     courseCode: '',
@@ -24,6 +52,7 @@ export default function CourseDetail() {
     onlineResources: '',
     courseDescription: '',
     uploadCourse: null,
+
   });
 
 
@@ -89,6 +118,12 @@ export default function CourseDetail() {
     formData.append('onlineResources', courseData.onlineResources);
     formData.append('courseDescription', courseData.courseDescription);
 
+    if (userId) {
+      formData.append('userId', userId);
+    } else {
+      alert("User ID is not available. Please try again.");
+      return;
+    }
     // If there's a file to upload
     if (courseData.uploadCourse) {
       formData.append("uploadCourse", courseData.uploadCourse);

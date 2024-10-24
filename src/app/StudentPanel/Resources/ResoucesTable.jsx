@@ -7,15 +7,46 @@ import Image from "next/image";
 import download from "./download.png";
 import { format } from "date-fns";
 import { fetchLibraryData } from "../../../../api/libraryapi"; // api to fetch library data 
+import { checkUserRole } from "../../../../api/api"; // Import checkUserRole function
+import { useUser } from '@auth0/nextjs-auth0/client';
 
 export default function ResourcesTable({ filter, searchTerm }) {
   const [resourcesData, setResourcesData] = useState([]);
+  const [userId, setUserId] = useState(null);
+  const { user, error: authError, isLoading: userLoading } = useUser();
 
+
+  // Check user role and retrieve userId
+  useEffect(() => {
+    if (!user) return;
+    async function getUserRole() {
+      const email = user?.email; // Ensure user email is available
+      if (!email) return; // Prevent unnecessary fetch
+
+      try {
+        const result = await checkUserRole(email); // Use the imported function
+
+        if (result.exists) {
+          setUserId(result.userId); // Set userId from the response
+        } else {
+          setError("User not found or does not exist.");
+        }
+      } catch (error) {
+        console.error("Error fetching user role:", error);
+        setError("Failed to fetch user role.");
+      }
+    }
+
+    getUserRole();
+  }, [user]);
+
+  // Fetch  library data on component mount
   // call api to fetch library data 
   useEffect(() => {
+    if (!userId) return;
     const getData = async () => {
       try {
-        const data = await fetchLibraryData();
+        const data = await fetchLibraryData(userId);
         console.log(data);
         setResourcesData(data.libraryItems);
       } catch (error) {
@@ -24,7 +55,7 @@ export default function ResourcesTable({ filter, searchTerm }) {
     };
 
     getData();
-  }, []);
+  }, [userId]);
 
   // use to search 
   const filteredData = resourcesData.filter(
@@ -63,9 +94,9 @@ export default function ResourcesTable({ filter, searchTerm }) {
               >
                 <td className="py-4 px-6 text-left">{index + 1}</td>
                 <td className="py-4 px-6 text-left text-blue-500 underline">
-                 
-                    {item.title}
-                 
+
+                  {item.title}
+
                 </td>
                 <td className="py-4 px-6 text-left">{item.description}</td>
                 <td className="py-4 px-6 text-left">{item.type}</td>
@@ -75,7 +106,7 @@ export default function ResourcesTable({ filter, searchTerm }) {
                   {format(new Date(item.dateAdded), "yyyy-MM-dd")}
                 </td>
                 <td className="py-4 px-6 text-left flex gap-2">
-                  <Link href={`http://localhost:5000/api/library/${item.uploadBookPdf}`} target="_blank">
+                  <Link href={`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/library/${item.uploadBookPdf}`} target="_blank">
                     <Image src={download} alt="Download PDF" />
                   </Link>
 

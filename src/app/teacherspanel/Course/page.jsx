@@ -9,6 +9,8 @@ import { SlRefresh } from "react-icons/sl";
 import CourseTable from "./CourseTable";
 import { fetchCourseData } from "../../../../api/courseapi"; // api to fetch course data 
 import { importCourseData } from "../../../../api/courseapi"; // api to import course data 
+import { checkUserRole } from "../../../../api/teacherapi"; // Import checkUserRole function
+import { useUser } from '@auth0/nextjs-auth0/client';
 
 export default function Course() {
   const [filter, setFilter] = useState("");
@@ -16,13 +18,40 @@ export default function Course() {
   const [totalCourses, setTotalCourses] = useState(0);
   const [message, setMessage] = useState(""); // For displaying success/error messages
   const fileInputRef = useRef(null); // Reference to the file input
+  const [userId, setUserId] = useState(null);
+  const { user, error: authError, isLoading: userLoading } = useUser();
+
+
+
+  // Check user role and retrieve userId
+  useEffect(() => {
+    async function getUserRole() {
+      const email = user?.email; // Ensure user email is available
+      if (!email) return; // Prevent unnecessary fetch
+
+      try {
+        const result = await checkUserRole(email); // Use the imported function
+
+        if (result.exists) {
+          setUserId(result.userId); // Set userId from the response
+        } else {
+          setError("User not found or does not exist.");
+        }
+      } catch (error) {
+        console.error("Error fetching user role:", error);
+        setError("Failed to fetch user role.");
+      }
+    }
+
+    getUserRole();
+  }, [user]);
 
 
   // use to call api to fetch coursecount 
   useEffect(() => {
     async function loadCourses() {
       try {
-        const data = await fetchCourseData();
+        const data = await fetchCourseData(userId);
         setTotalCourses(data.count);
       } catch (error) {
         console.error("Failed to fetch courses data:", error);
@@ -30,7 +59,7 @@ export default function Course() {
     }
 
     loadCourses();
-  }, []);
+  }, [userId]);
 
   // Handle file selection and upload
   const handleFileChange = async (event) => {

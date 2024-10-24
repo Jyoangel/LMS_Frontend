@@ -6,18 +6,59 @@ import { FaArrowLeftLong } from "react-icons/fa6";
 import Successcard from "@/Components/Successcard";
 import { addReportCardData } from "../../../../../../api/reportcardapi"; // api to add report card using admit card 
 import { fetchAdmitCardById } from "../../../../../../api/reportcardapi"; // use to fetch admitCard ID 
+import { checkUserRole } from "../../../../../../api/teacherapi"; // Import checkUserRole function
+import { useUser } from '@auth0/nextjs-auth0/client';
+
 
 export default function AddReportCard({ params }) {
   const { admitCardId } = params;
   const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [admitCard, setAdmitCard] = useState(null);
-  const [errorMessage, setErrorMessage] = useState("");// To store AdmitCard data
+  const [errorMessage, setErrorMessage] = useState(""); // To store error messages
+  const [userId, setUserId] = useState(null);
+  const { user, error: authError, isLoading: userLoading } = useUser();
+
   const [formData, setFormData] = useState({
-    //type: "",
     marks: {},
     classTeacher: "",
-    admitCardId: admitCardId
+    admitCardId: admitCardId,
+    userId: null,
   });
+
+  // Check user role and retrieve userId
+  useEffect(() => {
+    async function getUserRole() {
+      const email = user?.email; // Ensure user email is available
+      if (!email) return; // Prevent unnecessary fetch
+
+      try {
+        const result = await checkUserRole(email); // Use the imported function
+
+        if (result.exists) {
+          setUserId(result.userId); // Set userId from the response
+        } else {
+          setErrorMessage("User not found or does not exist.");
+        }
+      } catch (error) {
+        console.error("Error fetching user role:", error);
+        setErrorMessage("Failed to fetch user role.");
+      }
+    }
+
+    if (user) {
+      getUserRole();
+    }
+  }, [user]);
+
+  // Update formData with userId when userId is fetched
+  useEffect(() => {
+    if (userId) {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        userId: userId,
+      }));
+    }
+  }, [userId]);
 
   // Fetch AdmitCard data by ID when component mounts
   useEffect(() => {
@@ -109,7 +150,7 @@ export default function AddReportCard({ params }) {
     <>
       <div className="h-screen w-full flex flex-col px-5 py-10 gap-10">
         <div className="w-full">
-          <Link href={"/AdminDashboard/ReportCard"}>
+          <Link href={"/teacherspanel/ReportCard"}>
             <button className="flex items-center justify-center gap-3">
               <FaArrowLeftLong className="h-10 w-10 bg-gray-100 rounded-full p-2" />
               <h1 className="text-lg font-semibold">Back</h1>
@@ -184,7 +225,7 @@ export default function AddReportCard({ params }) {
           <Successcard
             para={"Report Card sent Successfully"}
             onClose={closeModal}
-            url={"/AdminDashboard/ReportCard"}
+            url={"/teacherspanel/ReportCard"}
           />
         )}
       </div>

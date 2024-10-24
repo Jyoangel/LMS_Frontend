@@ -6,14 +6,16 @@ import { useState, useEffect } from "react";
 import { fetchStudentData } from "../../../../../api/api"; // fetch student data api 
 import { fetchFeeRecordByStudentID } from "../../../../../api/api"; // fetch api fee by studentID 
 import { format } from "date-fns";
+import { useUser } from '@auth0/nextjs-auth0/client'; // Import Auth0 client hook
 
-export default function UserManagementTable({ filter, searchTerm }) {
+export default function FeeTable({ filter, searchTerm }) {
   const [data, setData] = useState({ students: [] });
   const [feeData, setFeeData] = useState({});
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  // Get the authenticated user details from Auth0
+  const { user, error: authError, isLoading: userLoading } = useUser();
 
 
   // use to fetch fee Record data by studentID
@@ -33,7 +35,7 @@ export default function UserManagementTable({ filter, searchTerm }) {
   // use to fetch student data 
   const loadItems = async () => {
     try {
-      const studentData = await fetchStudentData();
+      const studentData = await fetchStudentData(user.sub);
       setData(studentData);
 
       // Fetch fee data for each student
@@ -59,8 +61,14 @@ export default function UserManagementTable({ filter, searchTerm }) {
   };
 
   useEffect(() => {
-    loadItems();
-  }, []);
+    if (!userLoading && !authError) {
+      loadItems(); // Load data only when user is authenticated
+    }
+  }, [user, userLoading, authError]); // Trigger loadItems when user is available
+
+  if (userLoading) return <div>Loading...</div>; // Show loading indicator while fetching user details
+  if (authError) return <div>{authError.message}</div>; // Handle authentication error
+
 
   const filteredData = data.students.filter(
     (item) =>

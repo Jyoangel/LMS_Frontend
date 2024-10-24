@@ -5,15 +5,47 @@ import React, { useState, useEffect } from 'react';
 import { fetchAttendanceData, updateAttendance } from '../../../../../api/attendanceapi'; // api to fetch and update attendance data 
 import { format } from "date-fns";
 import Link from "next/link";
+import { checkUserRole } from "../../../../../api/teacherapi"; // Import checkUserRole function
+import { useUser } from '@auth0/nextjs-auth0/client';
 
 export default function Attendancetable({ setSelectedStudents }) {
   const [attendanceData, setAttendanceData] = useState([]);
   const [checkboxState, setCheckboxState] = useState({}); // For tracking selected checkboxes
+  const [userId, setUserId] = useState(null);
+  const { user, error: authError, isLoading: userLoading } = useUser();
+
+
+
+  // Check user role and retrieve userId
+  useEffect(() => {
+    if (!user) return;
+    async function getUserRole() {
+      const email = user?.email; // Ensure user email is available
+      if (!email) return; // Prevent unnecessary fetch
+
+      try {
+        const result = await checkUserRole(email); // Use the imported function
+
+        if (result.exists) {
+          setUserId(result.userId); // Set userId from the response
+        } else {
+          setError("User not found or does not exist.");
+        }
+      } catch (error) {
+        console.error("Error fetching user role:", error);
+        setError("Failed to fetch user role.");
+      }
+    }
+
+    getUserRole();
+  }, [user]);
+
   // use to fetch attendance data 
   useEffect(() => {
+    if (!userId) return;
     async function fetchData() {
       try {
-        const data = await fetchAttendanceData();
+        const data = await fetchAttendanceData(userId);
         setAttendanceData(data.attendance);
         console.log(data); // Check if data includes populated student details
       } catch (error) {
@@ -22,7 +54,7 @@ export default function Attendancetable({ setSelectedStudents }) {
     }
 
     fetchData();
-  }, []);
+  }, [userId]);
 
   const handleCheckboxChange = (studentId) => {
     setCheckboxState((prev) => ({

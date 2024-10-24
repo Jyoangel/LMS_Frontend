@@ -5,11 +5,13 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { fetchClassScheduleByClass } from "../../../../api/classScheduleapi"; // Fetch API
+import { useUser } from '@auth0/nextjs-auth0/client';
 
 const Timetable = () => {
   const [scheduleData, setScheduleData] = useState([]);
   const [visibleCells, setVisibleCells] = useState({});
   const [selectedClass, setSelectedClass] = useState(""); // State to store the selected class
+  const { user, error, isLoading } = useUser()
 
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   const periods = [1, 2, 3, 4, 5, 6, 7, 8];
@@ -19,7 +21,7 @@ const Timetable = () => {
     if (selectedClass) {
       const fetchData = async () => {
         try {
-          const data = await fetchClassScheduleByClass(selectedClass);
+          const data = await fetchClassScheduleByClass(selectedClass, user.sub);
           console.log("Fetched Schedule Data:", data); // Debugging log
           setScheduleData(data);
         } catch (error) {

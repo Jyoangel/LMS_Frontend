@@ -1,13 +1,19 @@
 "use client";
 
+
+
 import Successcard from "@/Components/Successcard";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaArrowLeftLong } from "react-icons/fa6";
 import { addCourseData } from "../../../../../api/courseapi"; // api to add course data 
+import { useUser } from '@auth0/nextjs-auth0/client';
 
 export default function CourseDetail() {
   const [isSelectOpen, setisSelectOpen] = useState(false);
+  const { user, error, isLoading } = useUser(); // Get user from Auth0
+
+  const [userId, setUserId] = useState(""); // Keep userId separate from course data
   const [courseData, setCourseData] = useState({
     courseName: '',
     courseCode: '',
@@ -26,6 +32,13 @@ export default function CourseDetail() {
     uploadCourse: null,
   });
 
+  // Set userId when user data is available
+  useEffect(() => {
+    if (user && user.sub) {
+      console.log("User ID:", user.sub); // Log user.sub to confirm it's a valid string
+      setUserId(user.sub); // Set userId directly
+    }
+  }, [user]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -34,8 +47,6 @@ export default function CourseDetail() {
       [name]: value
     });
   };
-
-
 
   const handleScheduleChange = (e) => {
     const { name, value } = e.target;
@@ -63,8 +74,6 @@ export default function CourseDetail() {
     setisSelectOpen(false);
   };
 
-  // use to submit form and call api to add course data 
-
   const handleSubmit = async (event) => {
     event.preventDefault();
     console.log('Course Data:', courseData);
@@ -88,6 +97,9 @@ export default function CourseDetail() {
     formData.append('supplementaryMaterials', courseData.supplementaryMaterials);
     formData.append('onlineResources', courseData.onlineResources);
     formData.append('courseDescription', courseData.courseDescription);
+
+    // Add userId to formData (make sure it's a string)
+    formData.append('userId', userId); // Ensure userId is passed as a string
 
     // If there's a file to upload
     if (courseData.uploadCourse) {
@@ -114,8 +126,11 @@ export default function CourseDetail() {
         supplementaryMaterials: '',
         onlineResources: '',
         courseDescription: '',
-        uploadCourse: null
+        uploadCourse: null,
       });
+
+      // Reset userId
+      setUserId(user.sub);
 
       openModal();
     } catch (error) {
@@ -123,6 +138,8 @@ export default function CourseDetail() {
       alert(`Error: ${error.message}`);
     }
   };
+
+
 
 
   return (

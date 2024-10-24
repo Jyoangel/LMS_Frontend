@@ -5,10 +5,13 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { FaArrowLeftLong } from "react-icons/fa6";
 import { addCalendarData } from "../../../../../api/calendarapi"; // Importing the API function to add calendar data
+import { useUser } from '@auth0/nextjs-auth0/client';
 
 // Main component for adding calendar details
 const AddDetails = () => {
     // State to manage form data, select dropdown visibility, and success message
+    const { user, error, isLoading } = useUser();
+
     const [formData, setFormData] = useState({
         type: '',            // Calendar entry type (e.g., Event, Exam)
         title: '',           // Title of the calendar entry
@@ -16,7 +19,8 @@ const AddDetails = () => {
         startTime: '',       // Start time of the event
         endTime: '',         // End time of the event
         duration: '',        // Duration of the event
-        description: '',     // Description of the event
+        description: '',
+        userId: user ? user.sub : '',     // Description of the event
     });
     const [isSelectOpen, setIsSelectOpen] = useState(false); // State to control the success message display
     const [successMessage, setSuccessMessage] = useState(''); // Holds the success or error message

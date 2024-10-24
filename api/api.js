@@ -1,18 +1,14 @@
-// fetch Student data 
-export async function fetchStudentData() {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/get`);
+export async function fetchStudentData(userId) {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/get?userId=${userId}`);
 
     if (!res.ok) {
-        throw new Error('Failed to fetch data');
+        throw new Error('Failed to fetch student data');
     }
 
     return res.json();
 }
 
 
-
-
-//add student data
 export async function addStudentData(studentData) {
     try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/add`, {
@@ -20,10 +16,12 @@ export async function addStudentData(studentData) {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(studentData),
+            body: JSON.stringify({
+                ...studentData,
+                userId: encodeURIComponent(studentData.userId), // URL-encode the userId to handle special characters
+            }),
         });
 
-        // Check if the server response is not OK (status code is not in the range of 200-299)
         if (!res.ok) {
             // Try to extract the error message from the response body
             const errorData = await res.json();
@@ -37,6 +35,47 @@ export async function addStudentData(studentData) {
         throw new Error(error.message || 'Something went wrong while adding student data');
     }
 }
+
+
+// // fetch Student data 
+// export async function fetchStudentData() {
+//     const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/get`);
+
+//     if (!res.ok) {
+//         throw new Error('Failed to fetch data');
+//     }
+
+//     return res.json();
+// }
+
+
+
+
+// //add student data
+// export async function addStudentData(studentData) {
+//     try {
+//         const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/add`, {
+//             method: 'POST',
+//             headers: {
+//                 'Content-Type': 'application/json',
+//             },
+//             body: JSON.stringify(studentData),
+//         });
+
+//         // Check if the server response is not OK (status code is not in the range of 200-299)
+//         if (!res.ok) {
+//             // Try to extract the error message from the response body
+//             const errorData = await res.json();
+//             // Throw an error with the message returned from the server
+//             throw new Error(errorData.message || 'Failed to add student data');
+//         }
+
+//         return res.json(); // Parse and return the JSON data if the response is OK
+//     } catch (error) {
+//         // Catch any network or server errors and rethrow with a proper message
+//         throw new Error(error.message || 'Something went wrong while adding student data');
+//     }
+// }
 
 
 //fetch studentdata by StudentID(string)
@@ -156,8 +195,8 @@ export async function fetcheventData() {
 // Count Data for Student
 
 
-export async function fetchCountData() {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/count`);
+export async function fetchCountData(userId) {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/count?userId=${userId}`);
 
     if (!res.ok) {
         throw new Error('Failed to fetch data');
@@ -165,6 +204,7 @@ export async function fetchCountData() {
 
     return res.json();
 }
+
 
 //Fees api
 
@@ -188,8 +228,8 @@ export async function addFeeData(FeeData) {
 
 // Fetch all Fee Data for student 
 
-export async function fetchFeeData() {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/fees/get`);
+export async function fetchFeeData(userId) {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/fees/get?userId=${userId}`);
 
     if (!res.ok) {
         throw new Error('Failed to fetch data');
@@ -362,13 +402,81 @@ export const sendSMS = async (message) => {
     }
 };
 
-// Count api ti fetch all count 
-export async function getData() {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/count/count`);
+// Count api to fetch all count 
+export async function getData(userId) {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/count/count?userId=${userId}`);
 
     if (!res.ok) {
         throw new Error('Failed to fetch data');
     }
 
     return res.json();
+}
+
+
+
+export async function fetchAllData(userId) {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/count/all?userId=${userId}`); // Make sure the URL matches your server endpoint
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok ' + response.statusText);
+        }
+
+        const data = await response.json(); // Parse the JSON response
+
+        // You can handle the data as needed
+        console.log('Students:', data.students);
+        console.log('Teachers:', data.teachers);
+        console.log('Staff:', data.staff);
+
+        return data; // Return the data if needed
+
+    } catch (error) {
+        console.error('Error fetching data:', error); // Log any errors
+        return null; // Return null or handle the error as needed
+    }
+}
+
+
+// api.js - Function to send messages to all users
+
+export const sendAllMessages = async (subject, message, userId) => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/sendAllMessages`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ subject, message, userId }), // Include userId in the request body
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to send messages');
+        }
+
+        const data = await response.json();
+        return data; // return response data, can include 'Messages sent successfully' or other info
+    } catch (error) {
+        console.error('Error sending messages:', error.message);
+        throw error; // rethrow the error to handle it in the component
+    }
+};
+
+export async function checkUserRole(email) {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/student/check-role?email=${email}`);
+        const text = await response.text(); // Get the response as text
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = JSON.parse(text); // Parse the text as JSON
+        return result; // Return the parsed result
+    } catch (error) {
+        console.error("Error fetching user role:", error);
+        throw new Error("Failed to fetch user role.");
+    }
 }

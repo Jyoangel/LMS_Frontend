@@ -12,6 +12,7 @@ import student from "./img/student.png";
 import teachers from "./img/teachers.png";
 import Link from "next/link";
 
+
 import { fetchCalendarData } from "../../../../api/calendarapi"; // api to fetch calendar dta 
 import SchoolChart from './components/InteractiveGraph';
 import { fetchReportCardData } from "../../../../api/reportcardapi"; // api to fetch repoty card
@@ -19,6 +20,7 @@ import { fetchSchoolOverviewData } from "../../../../api/attendanceapi"; // api 
 
 import { getData } from "../../../../api/api";// api to fetch count of all student teacher and staff struggling student excellence student 
 
+import { useUser } from '@auth0/nextjs-auth0/client';
 
 export default function Main() {
   const [data, setData] = useState(null);
@@ -27,13 +29,14 @@ export default function Main() {
   const [error, setError] = useState(null);
   const [topStudents, setTopStudents] = useState([]);
   const [schoolOverviewData, setSchoolOverviewData] = useState(null);
+  const { user, isLoading } = useUser();
 
 
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const data = await getData();
+        const data = await getData(user.sub);
         setData(data);
       } catch (err) {
         setError(err.message);
@@ -48,7 +51,7 @@ export default function Main() {
     // Fetch data when the component mounts
     const fetchData = async () => {
       try {
-        const data = await fetchReportCardData();
+        const data = await fetchReportCardData(user.sub);
         const filteredStudents = data.filter(student => student.percentage > 80);
         setTopStudents(filteredStudents);
       } catch (err) {
@@ -63,7 +66,7 @@ export default function Main() {
   useEffect(() => {
     async function fetchEvents() {
       try {
-        const eventData = await fetchCalendarData();
+        const eventData = await fetchCalendarData(user.sub);
         const currentDate = new Date();
         const currentMonth = currentDate.getMonth();
         const currentYear = currentDate.getFullYear();
@@ -97,29 +100,13 @@ export default function Main() {
     getSchoolOverviewData();
   }, []);
 
-  useEffect(() => {
-    // Fetch report card data when the component mounts
-    const fetchData = async () => {
-      try {
-        const data = await fetchReportCardData();
-        const filteredStudents = data.filter(student => student.percentage > 80);
-        setTopStudents(filteredStudents);
-      } catch (err) {
-        setError(err.message);
-      }
-    };
-
-    fetchData();
-  }, []);
 
 
   if (loading) {
     return <div>Loading...</div>;
   }
 
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
+
 
   if (!data) {
     return <div>No data found</div>;

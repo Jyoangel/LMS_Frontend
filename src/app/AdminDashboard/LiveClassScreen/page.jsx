@@ -7,18 +7,19 @@ import { FaAngleLeft, FaAngleRight } from "react-icons/fa6";
 import { SlRefresh } from "react-icons/sl";
 import LiveClassTable from "./LiveClassTable";
 import { fetchCourseData } from "../../../../api/courseapi"; // api to fetch course count 
+import { useUser } from '@auth0/nextjs-auth0/client'; // Import Auth0 client hook
 
 export default function LiveClassScreen() {
   const [filter, setFilter] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [totalCourses, setTotalCourses] = useState(0);
-
+  const { user, error: authError, isLoading: userLoading } = useUser();
 
   // use to fetch library count 
   useEffect(() => {
     const getData = async () => {
       try {
-        const data = await fetchCourseData();
+        const data = await fetchCourseData(user.sub);
         // Update your component state with data
         setTotalCourses(data.count);
       } catch (error) {

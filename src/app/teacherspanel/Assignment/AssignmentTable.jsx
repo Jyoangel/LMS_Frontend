@@ -6,18 +6,49 @@ import Link from "next/link";
 import { fetchAssignmentData, deleteAssignmentData } from "../../../../api/assignmentapi"; // api to fetch and delete assignmnet data 
 
 import { format } from "date-fns";
+import { checkUserRole } from "../../../../api/teacherapi"; // Import checkUserRole function
+import { useUser } from '@auth0/nextjs-auth0/client';
 
 export default function AssignmentTable({ filter, searchTerm }) {
   const [isDelete, setDelete] = useState(false);
   const [assignmentData, setAssignmentData] = useState({ assignments: [] });
   const [isLoading, setLoading] = useState(true);
   const [selectedAssignmentId, setSelectedAssignmentId] = useState(null);
+  const [userId, setUserId] = useState(null);
+  const { user, error: authError, isLoading: userLoading } = useUser();
+
+
+
+  // Check user role and retrieve userId
+  useEffect(() => {
+    if (!user) return;
+    async function getUserRole() {
+      const email = user?.email; // Ensure user email is available
+      if (!email) return; // Prevent unnecessary fetch
+
+      try {
+        const result = await checkUserRole(email); // Use the imported function
+
+        if (result.exists) {
+          setUserId(result.userId); // Set userId from the response
+        } else {
+          setError("User not found or does not exist.");
+        }
+      } catch (error) {
+        console.error("Error fetching user role:", error);
+        setError("Failed to fetch user role.");
+      }
+    }
+
+    getUserRole();
+  }, [user]);
 
   // use to fetch assignment data 
   useEffect(() => {
+    if (!userId) return;
     const fetchData = async () => {
       try {
-        const data = await fetchAssignmentData();
+        const data = await fetchAssignmentData(userId);
         setAssignmentData(data);
       } catch (error) {
         console.error('Error fetching assignment data:', error);
@@ -27,7 +58,7 @@ export default function AssignmentTable({ filter, searchTerm }) {
     };
 
     fetchData();
-  }, []);
+  }, [userId]);
 
   const openDelete = (id) => {
     setSelectedAssignmentId(id);

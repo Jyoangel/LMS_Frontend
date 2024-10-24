@@ -1,7 +1,7 @@
 "use server"
 // fetch all attendance data
-export async function fetchAttendanceData() {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/attendance/get`);
+export async function fetchAttendanceData(userId) {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/attendance/get?userId=${userId}`);
 
     if (!res.ok) {
         throw new Error('Failed to fetch data');

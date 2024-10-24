@@ -1,7 +1,7 @@
 //fetch teacher data 
 
-export async function fetchTeacherData() {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/teacher/get`);
+export async function fetchTeacherData(userId) {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/teacher/get?userId=${userId}`);
 
     if (!res.ok) {
         throw new Error('Failed to fetch data');
@@ -18,7 +18,10 @@ export async function addTeacherData(teacherData) {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(teacherData),
+            body: JSON.stringify({
+                ...teacherData,
+                userId: encodeURIComponent(teacherData.userId), // URL-encode the userId to handle special characters
+            }),
         });
 
         // Check if the server response is not OK (status code is not in the range of 200-299)
@@ -91,8 +94,8 @@ export async function deleteTeacherData(id) {
 
 //fetch count of teacher 
 
-export async function fetchCountTeacherData() {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/teacher/count`);
+export async function fetchCountTeacherData(userId) {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/teacher/count?userId=${userId}`);
 
     if (!res.ok) {
         throw new Error('Failed to fetch data');
@@ -100,6 +103,7 @@ export async function fetchCountTeacherData() {
 
     return res.json();
 }
+
 
 //fetch paymentTeacher 
 
@@ -200,3 +204,24 @@ export const sendMessages = async (subject, message) => {
         throw error;
     }
 };
+
+
+
+// checkrole api/teacherapi.js
+
+export async function checkUserRole(email) {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/teacher/check-role?email=${email}`);
+        const text = await response.text(); // Get the response as text
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = JSON.parse(text); // Parse the text as JSON
+        return result; // Return the parsed result
+    } catch (error) {
+        console.error("Error fetching user role:", error);
+        throw new Error("Failed to fetch user role.");
+    }
+}
