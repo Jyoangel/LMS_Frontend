@@ -55,15 +55,23 @@ export default function UpdateDetails({ params }) {
             try {
                 const studentData = await fetchStudentById(studentID);
                 if (studentData) {
+                    // Format dateOfBirth to "yyyy-MM-dd" if it's a valid date
+                    if (studentData.dateOfBirth) {
+                        const formattedDate = new Date(studentData.dateOfBirth)
+                            .toISOString()
+                            .split("T")[0];
+                        studentData.dateOfBirth = formattedDate;
+                    }
                     setFormData(studentData);
                 }
             } catch (error) {
-                console.error('Failed to fetch student data:', error);
+                console.error("Failed to fetch student data:", error);
             }
         }
 
         fetchData();
     }, [studentID]);
+
 
     const openModal = () => {
         setisSelectOpen(true);

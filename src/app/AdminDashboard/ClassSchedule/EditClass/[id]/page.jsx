@@ -65,6 +65,12 @@ export default function EditClass({ params }) {
       return; // Stop form submission if validation fails
     }
 
+    // Check if start time is before end time
+    if (startTime >= endTime) {
+      alert("Start time must be earlier than end time.");
+      return;
+    }
+
 
     try {
       await updateClassScheduleData(id, classSchedule);

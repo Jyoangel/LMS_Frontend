@@ -40,6 +40,11 @@ const StaffDetail = ({ params }) => {
     };
 
     const [formData, setFormData] = useState(initialFormData);
+    const [validation, setValidation] = useState({
+        isContactNumberValid: true,
+        isEmailValid: true,
+        isAadharValid: true,
+    });
 
     // call fetch api for intial data 
     useEffect(() => {
@@ -60,10 +65,21 @@ const StaffDetail = ({ params }) => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
+
+        // Update form data
         setFormData((prevData) => ({
             ...prevData,
-            [name]: value
+            [name]: value,
         }));
+
+        // Reset validity on change for contact number and email
+        if (name === "contactNumber") {
+            setValidation((prev) => ({ ...prev, isContactNumberValid: true }));
+        } else if (name === "email") {
+            setValidation((prev) => ({ ...prev, isEmailValid: true }));
+        } else if (name === "aadharNumber") {
+            setValidation((prev) => ({ ...prev, isAadharValid: true }));
+        }
     };
 
     const handleEmergencyContactChange = (e) => {
@@ -80,6 +96,49 @@ const StaffDetail = ({ params }) => {
     //  update staff 
     const handleUpdate = async (e) => {
         e.preventDefault();
+        // Client-side validation
+        const { staffID, name, dateOfBirth, gender, contactNumber, email, aadharNumber, position, employmentType, emergencyContact, salary } = formData;
+
+        if (!staffID || !name || !dateOfBirth || !gender || !contactNumber || !email || !aadharNumber || !position || !employmentType || !salary) {
+            alert("Please fill in all required fields.");
+            return;
+        }
+
+        // Validate email format
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailPattern.test(email)) {
+            setValidation({ isEmailValid: false }); // Update email validity
+            alert("Please enter a valid email address.");
+            return;
+        }
+
+        // Validate contact number (for simplicity, let's assume it should be a 10-digit number)
+        const contactNumberPattern = /^\d{10}$/;
+        if (!contactNumberPattern.test(contactNumber)) {
+            setValidation({ isContactNumberValid: false }); // Update contact number validity
+            alert("Please enter a valid contact number (10 digits).");
+            return;
+        }
+
+        // Validate aadhar number (12-digit number for India)
+        const aadharPattern = /^(?!.*(\d)\1{11})\d{12}$/;
+        if (!aadharPattern.test(aadharNumber)) {
+            setValidation({ isAadharValid: false });
+            alert("Please enter a valid 12-digit Aadhar number.");
+            return;
+        }
+
+        // Validate emergency contact number (10-digit number)
+        if (emergencyContact.contactNumber && !contactNumberPattern.test(emergencyContact.contactNumber)) {
+            alert("Please enter a valid 10-digit emergency contact number.");
+            return;
+        }
+
+        // Validate salary (non-negative number)
+        if (isNaN(salary) || Number(salary) <= 0) {
+            alert("Please enter a valid, positive salary amount.");
+            return;
+        }
         try {
             // Perform update operation using formData and studentID
             await updateStaffData(id, formData);
@@ -173,6 +232,9 @@ const StaffDetail = ({ params }) => {
                                 name="contactNumber"
                                 value={formData.contactNumber}
                                 onChange={handleChange}
+                                style={{
+                                    color: validation.isEmailValid ? 'initial' : 'red', // Change border color based on validity
+                                }}
                                 className="border border-gray-300 rounded-md w-full py-3 px-5 outline-none"
                             />
                         </div>
@@ -186,6 +248,9 @@ const StaffDetail = ({ params }) => {
                                 name="email"
                                 value={formData.email}
                                 onChange={handleChange}
+                                style={{
+                                    color: validation.isEmailValid ? 'initial' : 'red', // Change border color based on validity
+                                }}
                                 className="border border-gray-300 rounded-md w-full py-3 px-5 outline-none"
                             />
                         </div>
@@ -225,6 +290,9 @@ const StaffDetail = ({ params }) => {
                                 name="aadharNumber"
                                 value={formData.aadharNumber}
                                 onChange={handleChange}
+                                style={{
+                                    color: validation.isEmailValid ? 'initial' : 'red', // Change border color based on validity
+                                }}
                                 className="border border-gray-300 rounded-md w-full py-3 px-5 outline-none"
                             />
                         </div>

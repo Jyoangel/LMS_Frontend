@@ -1,5 +1,5 @@
 "use client";
-"use client";
+
 import Successcard from "@/Components/Successcard";
 import Link from "next/link";
 import { useState } from "react";
@@ -11,6 +11,7 @@ export default function AddEnquiry() {
   const [isSelectOpen, setisSelectOpen] = useState(false);
   const { user, error, isLoading } = useUser();
 
+
   const [formData, setFormData] = useState({
     name: "",
     contactNumber: "",
@@ -18,7 +19,10 @@ export default function AddEnquiry() {
     enquiryRelated: "",
     userId: user ? user.sub : '',
   });
-
+  const [validation, setValidation] = useState({
+    isContactNumberValid: true,
+    isEmailValid: true,
+  });
   const openModal = () => {
     setisSelectOpen(true);
   };
@@ -27,12 +31,22 @@ export default function AddEnquiry() {
     setisSelectOpen(false);
   };
 
+  // Handle change for form fields
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    // Update form data
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
     }));
+
+    // Reset validity on change for contact number and email
+    if (name === "contactNumber") {
+      setValidation((prev) => ({ ...prev, isContactNumberValid: true }));
+    } else if (name === "email") {
+      setValidation((prev) => ({ ...prev, isEmailValid: true }));
+    }
   };
   // Handle form submission and validation
   const handleSubmit = async (e) => {
@@ -49,6 +63,7 @@ export default function AddEnquiry() {
     // Validate email format
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailPattern.test(email)) {
+      setValidation({ isEmailValid: false }); // Update email validity
       alert("Please enter a valid email address.");
       return;
     }
@@ -56,9 +71,13 @@ export default function AddEnquiry() {
     // Validate contact number (for simplicity, let's assume it should be a 10-digit number)
     const contactNumberPattern = /^\d{10}$/;
     if (!contactNumberPattern.test(contactNumber)) {
+      setValidation({ isContactNumberValid: false }); // Update contact number validity
       alert("Please enter a valid contact number (10 digits).");
       return;
     }
+
+    // Reset validity if both fields are correct
+    setValidation({ isContactNumberValid: true, isEmailValid: true });
 
     try {
       // Call the API to add the enquiry data
@@ -115,6 +134,9 @@ export default function AddEnquiry() {
                 name="contactNumber"
                 value={formData.contactNumber}
                 onChange={handleChange}
+                style={{
+                  color: validation.isEmailValid ? 'initial' : 'red', // Change border color based on validity
+                }}
                 placeholder="Type here"
                 className="border border-gray-300 rounded-md w-full py-3 px-5 outline-none"
                 required
@@ -129,6 +151,9 @@ export default function AddEnquiry() {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
+                style={{
+                  color: validation.isEmailValid ? 'initial' : 'red', // Change border color based on validity
+                }}
                 placeholder="Type here"
                 className="border border-gray-300 rounded-md w-full py-3 px-5 outline-none"
                 required

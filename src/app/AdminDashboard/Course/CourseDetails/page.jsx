@@ -84,6 +84,16 @@ export default function CourseDetail() {
       return;
     }
 
+    // Convert startDate and endDate strings to Date objects
+    const startDate = new Date(courseData.schedule.startDate);
+    const endDate = new Date(courseData.schedule.endDate);
+
+    // Check that startDate is before endDate
+    if (startDate >= endDate) {
+      alert("The start date must be before the end date.");
+      return;
+    }
+
     const formData = new FormData();
     formData.append('courseName', courseData.courseName);
     formData.append('courseCode', courseData.courseCode);

@@ -25,10 +25,16 @@ export default function UpdateLiveClasses({ params }) {
             fetchInitialData(id);
         }
     }, [id]);
-    // fetch intial livecalass data in form 
+    // Fetch initial live class data in form 
     const fetchInitialData = async (id) => {
         try {
             const initialData = await fetchLiveClassById(id);
+
+            // Format date if it's a valid date
+            if (initialData.date) {
+                initialData.date = new Date(initialData.date).toISOString().split("T")[0];
+            }
+
             setLiveclassData(initialData);
         } catch (error) {
             console.error("Error fetching initial data:", error.message);

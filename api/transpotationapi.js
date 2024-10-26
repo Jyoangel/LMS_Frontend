@@ -1,6 +1,6 @@
 // fetch transportation data 
-export async function fetchTranspotationData() {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/transpotation/get`);
+export async function fetchTranspotationData(userId) {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/transpotation/get?userId=${userId}`);
 
     if (!res.ok) {
         throw new Error('Failed to fetch data');

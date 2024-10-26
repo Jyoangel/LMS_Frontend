@@ -1,8 +1,8 @@
 "use server"
 
 // fetch hostel data
-export async function fetchHotelData() {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/hotel/get`);
+export async function fetchHotelData(userId) {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/hotel/get?userId=${userId}`);
 
     if (!res.ok) {
         throw new Error('Failed to fetch data');

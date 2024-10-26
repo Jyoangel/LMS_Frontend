@@ -3,6 +3,7 @@ import Successcard from "@/Components/Successcard";
 import { useEffect, useRef, useState } from "react";
 import { RxCrossCircled } from "react-icons/rx";
 import { addPaymentData } from "../../../../../../api/teacherapi"; // add api for teacher payment 
+import { useUser } from '@auth0/nextjs-auth0/client'; // Import Auth0 client hook
 
 export default function PaymentEdit({ teacherId, onClose }) {
 
@@ -13,6 +14,7 @@ export default function PaymentEdit({ teacherId, onClose }) {
   const [error, setError] = useState(null);
 
   const editRef = useRef();
+  const { user, error: authError, isLoading: userLoading } = useUser();
 
 
   const openModal = () => {
@@ -52,7 +54,8 @@ export default function PaymentEdit({ teacherId, onClose }) {
       teacherId: teacherId,
       month,
       paidAmount: Number(salaryPaid),
-      remark
+      remark,
+      userId: user.sub
     };
 
     try {

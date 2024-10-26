@@ -8,7 +8,7 @@ import { CiSearch } from "react-icons/ci";
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa6";
 import { SlRefresh } from "react-icons/sl";
 import HotelTable from "./HotelTable";
-import { fetchCountData } from "../../../../api/api"; // api to fetch hostel count
+import { fetchHotelData } from "../../../../api/hotelapi"; // api to fetch hostel count
 import { useUser } from '@auth0/nextjs-auth0/client'; // Import Auth0 client hook  
 
 export default function HotelManagement() {
@@ -20,7 +20,7 @@ export default function HotelManagement() {
   useEffect(() => {
     const getData = async () => {
       try {
-        const data = await fetchCountData(user.sub);
+        const data = await fetchHotelData(user.sub);
         // Update your component state with data
         setTotalCourses(data.count);
       } catch (error) {
@@ -38,11 +38,7 @@ export default function HotelManagement() {
         <div className="w-full flex items-center justify-between">
           <h1 className="text-base font-medium">Hotel Rooms: {totalCourses}</h1>
           <div className="flex items-center justify-center gap-5">
-            <Link href={"/AdminDashboard/HotelManagement/AddHotel"}>
-              <button className="text-base font-semibold text-white bg-blue-500 px-4 py-2 rounded-lg">
-                Add New
-              </button>
-            </Link>
+
           </div>
         </div>
 

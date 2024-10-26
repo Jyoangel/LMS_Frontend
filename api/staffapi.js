@@ -109,8 +109,8 @@ export async function fetchCountStaffData(userId) {
 //Payment
 
 // fetch staff payement 
-export async function fetchPaymentStaffData() {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/StaffPayment/get`);
+export async function fetchPaymentStaffData(userId) {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/StaffPayment/get?userId=${userId}`);
 
     if (!res.ok) {
         throw new Error('Failed to fetch data');

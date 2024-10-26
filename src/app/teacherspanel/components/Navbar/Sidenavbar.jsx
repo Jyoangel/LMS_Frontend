@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { usePathname } from "next/navigation"; // Import usePathname hook
 import logo from "./img/logo.png";
 import calender from "./img/calender.png";
 import dashboard from "./img/dashboard.png";
@@ -14,207 +14,191 @@ import library from "./img/library.png";
 import reportcard from "./img/reportcard.png";
 import exam from "./img/exam.png";
 import course from "./img/course.png";
-import Attendance from "@/app/StudentPanel/Attendance/page";
 
 export default function Sidenavbar() {
-  const [isSelected, setIsSelected] = useState(1);
+  const pathname = usePathname(); // Get current route
 
-  const handleSelect = (value) => {
-    setIsSelected(value);
-  };
+  // Helper function to check if a route matches exactly
+  const isExactMatch = (path) => pathname === path;
+
+  // Helper function to check if a route starts with a base path
+  const isActive = (basePath) => pathname.startsWith(basePath);
 
   return (
-    <>
-      <div className="h-auto  w-[280px] flex flex-col shadow-xl">
-        <div className="p-5">
-          <Image src={logo} alt="logo" />
-        </div>
-
-        <Link href={"/teacherspanel/Dashboard"}>
-          <button
-            onClick={() => {
-              handleSelect(1);
-            }}
-            className={` ${isSelected === 1 ? "bg-blue-600 text-white" : " text-black"
-              } h-[50px] w-full  px-5 py-3 flex gap-3`}
-          >
-            <Image
-              src={dashboard}
-              alt="dashboard"
-              className={`h-6 w-6 ${isSelected === 1 ? "invert-0" : "invert "}`}
-            />
-            <h1 className="">Dashboard</h1>
-          </button>
-        </Link>
-        <Link href={"/teacherspanel/Attendance"}>
-          <button
-            onClick={() => {
-              handleSelect(10);
-            }}
-            className={` ${isSelected === 10 ? "bg-blue-600 text-white" : " text-black"
-              } h-[50px] w-full  px-5 py-3 flex gap-3`}
-          >
-            <Image
-              src={attendance}
-              alt="img"
-              className={`h-6 w-6 ${isSelected === 10 ? "invert" : "invert-0 "
-                }`}
-            />
-            <h1 className="">Attendance</h1>
-          </button>
-        </Link>
-        <Link href={"/teacherspanel/ClassSchedule"}>
-          <button
-            onClick={() => {
-              handleSelect(11);
-            }}
-            className={` ${isSelected === 11 ? "bg-blue-600 text-white" : " text-black"
-              } h-[50px] w-full  px-5 py-3 flex gap-3`}
-          >
-            <Image
-              src={classschedule}
-              alt="img"
-              className={`h-6 w-6 ${isSelected === 11 ? "invert" : "invert-0 "
-                }`}
-            />
-            <h1 className="">ClassSchedule</h1>
-          </button>
-        </Link>
-
-        <Link href={"/teacherspanel/Assignment"}>
-          <button
-            onClick={() => {
-              handleSelect(2);
-            }}
-            className={` ${isSelected === 2 ? "bg-blue-600 text-white" : " text-black"
-              } h-[50px] w-full  px-5 py-3 flex gap-3`}
-          >
-            <Image
-              src={assignment}
-              alt="img"
-              className={`h-6 w-6 ${isSelected === 2 ? "invert" : "invert-0 "}`}
-            />
-            <h1 className="">Assignments</h1>
-          </button>
-        </Link>
-
-        <Link href={"/teacherspanel/Student"}>
-          <button
-            onClick={() => {
-              handleSelect(3);
-            }}
-            className={` ${isSelected === 3 ? "bg-blue-600 text-white" : " text-black"
-              } h-[50px] w-full  px-5 py-3 flex gap-3`}
-          >
-            <Image
-              src={student}
-              alt="img"
-              className={`h-6 w-6 bg-black ${isSelected === 3 ? "invert" : "invert-0 "
-                }`}
-            />
-            <h1 className="">Students</h1>
-          </button>
-        </Link>
-
-        <Link href={"/teacherspanel/Classes"}>
-          <button
-            onClick={() => {
-              handleSelect(4);
-            }}
-            className={` ${isSelected === 4 ? "bg-blue-600 text-white" : " text-black"
-              } h-[50px] w-full  px-5 py-3 flex gap-3`}
-          >
-            <Image
-              src={calender}
-              alt="img"
-              className={`h-6 w-6 ${isSelected === 4 ? "invert" : "invert-0 "}`}
-            />
-            <h1 className="">HomeWork</h1>
-          </button>
-        </Link>
-
-        <Link href={"/teacherspanel/Chats"}>
-          <button
-            onClick={() => {
-              handleSelect(5);
-            }}
-            className={` ${isSelected === 5 ? "bg-blue-600 text-white" : " text-black"
-              } h-[50px] w-full  px-5 py-3 flex gap-3`}
-          >
-            <Image
-              src={chats}
-              alt="img"
-              className={`h-6 w-6 ${isSelected === 5 ? "invert" : "invert-0 "}`}
-            />
-            <h1 className="">Chats</h1>
-          </button>
-        </Link>
-
-        <Link href={"/teacherspanel/Library"}>
-          <button
-            onClick={() => {
-              handleSelect(6);
-            }}
-            className={` ${isSelected === 6 ? "bg-blue-600 text-white" : " text-black"
-              } h-[50px] w-full  px-5 py-3 flex gap-3`}
-          >
-            <Image
-              src={library}
-              alt="img"
-              className={`h-6 w-6 ${isSelected === 6 ? "invert" : "invert-0 "}`}
-            />
-            <h1 className="">Library</h1>
-          </button>
-        </Link>
-        <Link href={"/teacherspanel/ReportCard"}>
-          <button
-            onClick={() => {
-              handleSelect(7);
-            }}
-            className={` ${isSelected === 7 ? "bg-blue-600 text-white" : " text-black"
-              } h-[50px] w-full  px-5 py-3 flex gap-3`}
-          >
-            <Image
-              src={reportcard}
-              alt="img"
-              className={`h-6 w-6 ${isSelected === 7 ? "invert" : "invert-0 "}`}
-            />
-            <h1 className="">Report Card</h1>
-          </button>
-        </Link>
-        <Link href={"/teacherspanel/Exam"}>
-          <button
-            onClick={() => {
-              handleSelect(8);
-            }}
-            className={` ${isSelected === 8 ? "bg-blue-600 text-white" : " text-black"
-              } h-[50px] w-full  px-5 py-3 flex gap-3`}
-          >
-            <Image
-              src={exam}
-              alt="img"
-              className={`h-6 w-6 ${isSelected === 8 ? "invert" : "invert-0 "}`}
-            />
-            <h1 className="">Exam</h1>
-          </button>
-        </Link>
-        <Link href={"/teacherspanel/Course"}>
-          <button
-            onClick={() => {
-              handleSelect(9);
-            }}
-            className={` ${isSelected === 9 ? "bg-blue-600 text-white" : " text-black"
-              } h-[50px] w-full  px-5 py-3 flex gap-3`}
-          >
-            <Image
-              src={course}
-              alt="img"
-              className={`h-6 w-6 ${isSelected === 9 ? "invert" : "invert-0 "}`}
-            />
-            <h1 className="">Course</h1>
-          </button>
-        </Link>
+    <div className="h-auto w-[280px] flex flex-col shadow-xl">
+      <div className="p-5">
+        <Image src={logo} alt="logo" />
       </div>
-    </>
+
+      <Link href="/teacherspanel/Dashboard">
+        <button
+          className={`${isExactMatch("/teacherspanel/Dashboard")
+            ? "bg-blue-600 text-white"
+            : "text-black"
+            } h-[50px] w-full px-5 py-3 flex gap-3`}
+        >
+          <Image
+            src={dashboard}
+            alt="dashboard"
+            className={`h-6 w-6 ${isExactMatch("/teacherspanel/Dashboard") ? "invert-0" : "invert"
+              }`}
+          />
+          <h1>Dashboard</h1>
+        </button>
+      </Link>
+
+      <Link href="/teacherspanel/Attendance">
+        <button
+          className={`${isActive("/teacherspanel/Attendance")
+            ? "bg-blue-600 text-white"
+            : "text-black"
+            } h-[50px] w-full px-5 py-3 flex gap-3`}
+        >
+          <Image
+            src={attendance}
+            alt="attendance"
+            className={`h-6 w-6 ${isActive("/teacherspanel/Attendance") ? "invert" : "invert-0"
+              }`}
+          />
+          <h1>Attendance</h1>
+        </button>
+      </Link>
+
+      <Link href="/teacherspanel/ClassSchedule">
+        <button
+          className={`${isActive("/teacherspanel/ClassSchedule")
+            ? "bg-blue-600 text-white"
+            : "text-black"
+            } h-[50px] w-full px-5 py-3 flex gap-3`}
+        >
+          <Image
+            src={classschedule}
+            alt="classschedule"
+            className={`h-6 w-6 ${isActive("/teacherspanel/ClassSchedule") ? "invert" : "invert-0"
+              }`}
+          />
+          <h1>Class Schedule</h1>
+        </button>
+      </Link>
+
+      <Link href="/teacherspanel/Assignment">
+        <button
+          className={`${isActive("/teacherspanel/Assignment")
+            ? "bg-blue-600 text-white"
+            : "text-black"
+            } h-[50px] w-full px-5 py-3 flex gap-3`}
+        >
+          <Image
+            src={assignment}
+            alt="assignment"
+            className={`h-6 w-6 ${isActive("/teacherspanel/Assignment") ? "invert" : "invert-0"
+              }`}
+          />
+          <h1>Assignments</h1>
+        </button>
+      </Link>
+
+      <Link href="/teacherspanel/Student">
+        <button
+          className={`${isActive("/teacherspanel/Student")
+            ? "bg-blue-600 text-white"
+            : "text-black"
+            } h-[50px] w-full px-5 py-3 flex gap-3`}
+        >
+          <Image
+            src={student}
+            alt="student"
+            className={`h-6 w-6 ${isActive("/teacherspanel/Student") ? "invert-0" : "invert"
+              }`}
+          />
+          <h1>Students</h1>
+        </button>
+      </Link>
+
+      <Link href="/teacherspanel/Chats">
+        <button
+          className={`${isActive("/teacherspanel/Chats")
+            ? "bg-blue-600 text-white"
+            : "text-black"
+            } h-[50px] w-full px-5 py-3 flex gap-3`}
+        >
+          <Image
+            src={chats}
+            alt="chats"
+            className={`h-6 w-6 ${isActive("/teacherspanel/Chats") ? "invert" : "invert-0"
+              }`}
+          />
+          <h1>Chats</h1>
+        </button>
+      </Link>
+
+      <Link href="/teacherspanel/Library">
+        <button
+          className={`${isActive("/teacherspanel/Library")
+            ? "bg-blue-600 text-white"
+            : "text-black"
+            } h-[50px] w-full px-5 py-3 flex gap-3`}
+        >
+          <Image
+            src={library}
+            alt="library"
+            className={`h-6 w-6 ${isActive("/teacherspanel/Library") ? "invert" : "invert-0"
+              }`}
+          />
+          <h1>Library</h1>
+        </button>
+      </Link>
+
+      <Link href="/teacherspanel/ReportCard">
+        <button
+          className={`${isActive("/teacherspanel/ReportCard")
+            ? "bg-blue-600 text-white"
+            : "text-black"
+            } h-[50px] w-full px-5 py-3 flex gap-3`}
+        >
+          <Image
+            src={reportcard}
+            alt="reportcard"
+            className={`h-6 w-6 ${isActive("/teacherspanel/ReportCard") ? "invert" : "invert-0"
+              }`}
+          />
+          <h1>Report Card</h1>
+        </button>
+      </Link>
+
+      <Link href="/teacherspanel/Exam">
+        <button
+          className={`${isActive("/teacherspanel/Exam")
+            ? "bg-blue-600 text-white"
+            : "text-black"
+            } h-[50px] w-full px-5 py-3 flex gap-3`}
+        >
+          <Image
+            src={exam}
+            alt="exam"
+            className={`h-6 w-6 ${isActive("/teacherspanel/Exam") ? "invert" : "invert-0"
+              }`}
+          />
+          <h1>Exam</h1>
+        </button>
+      </Link>
+
+      <Link href="/teacherspanel/Course">
+        <button
+          className={`${isActive("/teacherspanel/Course")
+            ? "bg-blue-600 text-white"
+            : "text-black"
+            } h-[50px] w-full px-5 py-3 flex gap-3`}
+        >
+          <Image
+            src={course}
+            alt="course"
+            className={`h-6 w-6 ${isActive("/teacherspanel/Course") ? "invert" : "invert-0"
+              }`}
+          />
+          <h1>Course</h1>
+        </button>
+      </Link>
+    </div>
   );
 }

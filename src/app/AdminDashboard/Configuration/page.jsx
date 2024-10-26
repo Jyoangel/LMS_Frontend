@@ -77,7 +77,7 @@ export default function Configuration() {
             <div className="h-[180px] w-[260px] border border-gray-300 shadow-md flex flex-col gap-5 items-center justify-center rounded-lg">
               <Image src={hotelmanagement} className="h-18 w-20" />
               <h1 className=" text-lg text-black font-semibold">
-                Hotel Management
+                Hostel Management
               </h1>
             </div>
           </Link>

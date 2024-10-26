@@ -34,12 +34,32 @@ function EditAdmitCard({ params }) {
     const fetchInitialData = async (id) => {
         try {
             const data = await fetchAdmitCardById(id);
-            setFormData(data); // Set fetched data into formData state
+
+            // Format startdate and enddate if they are valid dates
+            if (data.startdate) {
+                data.startdate = new Date(data.startdate).toISOString().split("T")[0];
+            }
+            if (data.enddate) {
+                data.enddate = new Date(data.enddate).toISOString().split("T")[0];
+            }
+
+            // Format each examination_date in examsubjects
+            if (data.examsubjects && Array.isArray(data.examsubjects)) {
+                data.examsubjects = data.examsubjects.map((subject) => ({
+                    ...subject,
+                    examination_date: subject.examination_date
+                        ? new Date(subject.examination_date).toISOString().split("T")[0]
+                        : ""
+                }));
+            }
+
+            setFormData(data); // Set formatted data into formData state
         } catch (error) {
             console.error("Failed to fetch admit card data:", error.message);
             // Handle error or display an error message
         }
     };
+
 
     const handleChange = (e) => {
         const { name, value } = e.target;

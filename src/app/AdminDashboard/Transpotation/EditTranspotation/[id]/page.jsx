@@ -12,7 +12,9 @@ export default function EditTranspotation({ params }) {
 
         pickupLocation: "",
         dropLocation: "",
-        transportationFee: ""
+        transportationFee: "",
+        pickupTime: "",
+        dropTime: ""
     });
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -52,6 +54,36 @@ export default function EditTranspotation({ params }) {
     // handle submit and update 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!formData.pickupLocation) {
+            setValidationMessage("Please enter the pickup location.");
+            return;
+        }
+        if (!formData.dropLocation) {
+            setValidationMessage("Please enter the drop location.");
+            return;
+        }
+        if (!formData.transportationFee) {
+            setValidationMessage("Please enter the transportation fee.");
+            return;
+        }
+        if (!formData.pickupTime) {
+            setValidationMessage("Please enter the pickup time.");
+            return;
+        }
+        if (!formData.dropTime) {
+            setValidationMessage("Please enter the drop time.");
+            return;
+        }
+
+        // Validation: Pickup time must be before drop time
+        const pickupTime = new Date(`1970-01-01T${formData.pickupTime}:00`);
+        const dropTime = new Date(`1970-01-01T${formData.dropTime}:00`);
+
+        if (pickupTime >= dropTime) {
+            setValidationMessage("Pickup time must be before drop time.");
+            return;
+        }
+
         try {
             await updateTranspotationDataBystudentID(id, formData);
             openModal();

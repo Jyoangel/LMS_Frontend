@@ -48,7 +48,22 @@ export default function EditHotel({ params }) {
             zone: zone,
             price: price,
         };
-
+        if (!formData.TypeofRoom) {
+            alert("Please select the type of room.");
+            return;
+        }
+        if (!formData.floor) {
+            alert("Please enter the floor.");
+            return;
+        }
+        if (!formData.zone) {
+            alert("Please enter the zone.");
+            return;
+        }
+        if (!formData.price || isNaN(formData.price) || formData.price <= 0) {
+            alert("Please enter a valid price.");
+            return;
+        }
         try {
             // call the api to update the data 
             await updateHotelDataByStudentID(id, formData);
@@ -146,7 +161,7 @@ export default function EditHotel({ params }) {
                         <Successcard
                             onClose={closeModal}
                             para={"Room updated successfully!"}
-                            url={"/AdminDashboard/HotelManagement/AddHotel"}
+                            url={"/AdminDashboard/HotelManagement"}
                         />
                     )}
                 </form>

@@ -6,7 +6,7 @@ import { CiSearch } from "react-icons/ci";
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa6";
 import { SlRefresh } from "react-icons/sl";
 import TranspotationTable from "./TranspotationTable";
-import { fetchCountData } from "../../../../api/api"; // api to fetch transportation count 
+import { fetchTranspotationData } from "../../../../api/transpotationapi"; // api to fetch transportation count 
 import { useUser } from '@auth0/nextjs-auth0/client'; // Import Auth0 client hook
 
 export default function LibraryManage() {
@@ -19,7 +19,7 @@ export default function LibraryManage() {
   useEffect(() => {
     const getData = async () => {
       try {
-        const data = await fetchCountData(user.sub);
+        const data = await fetchTranspotationData(user.sub);
         // Update your component state with data
         setTotalCourses(data.count);
       } catch (error) {
@@ -37,11 +37,7 @@ export default function LibraryManage() {
         <div className="w-full flex items-center justify-between">
           <h1 className="text-base font-medium">Total Student: {totalCourses}</h1>
           <div className="flex items-center justify-center gap-5">
-            <Link href={"/AdminDashboard/Transpotation/AddTranspotation"}>
-              <button className="text-base font-semibold text-white bg-blue-500 px-4 py-2 rounded-lg">
-                Add New
-              </button>
-            </Link>
+
           </div>
         </div>
 

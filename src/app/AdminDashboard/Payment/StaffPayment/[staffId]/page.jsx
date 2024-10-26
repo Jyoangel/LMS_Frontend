@@ -3,6 +3,7 @@ import Successcard from "@/Components/Successcard";
 import { useEffect, useRef, useState } from "react";
 import { RxCrossCircled } from "react-icons/rx";
 import { addPaymentData } from "../../../../../../api/staffapi"; // add staff payment api 
+import { useUser } from '@auth0/nextjs-auth0/client'; // Import Auth0 client hook
 
 export default function PaymentEdit({ staffId, onClose }) {
 
@@ -11,7 +12,7 @@ export default function PaymentEdit({ staffId, onClose }) {
     const [month, setMonth] = useState('');
     const [remark, setRemark] = useState('');
     const [error, setError] = useState(null);
-
+    const { user, error: authError, isLoading: userLoading } = useUser();
     const editRef = useRef();
     const openModal = () => {
         setSuccess(true);
@@ -50,7 +51,8 @@ export default function PaymentEdit({ staffId, onClose }) {
             staffId: staffId,
             month,
             paidAmount: Number(salaryPaid),
-            remark
+            remark,
+            userId: user.sub
         };
 
         try {

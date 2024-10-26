@@ -34,16 +34,26 @@ export default function CourseEdit({ params }) {
             try {
                 const courseData = await fetchCourseById(id);
                 if (courseData) {
+                    // Format startDate and endDate if they are valid dates
+                    if (courseData.schedule?.startDate) {
+                        courseData.schedule.startDate = new Date(courseData.schedule.startDate)
+                            .toISOString()
+                            .split("T")[0];
+                    }
+                    if (courseData.schedule?.endDate) {
+                        courseData.schedule.endDate = new Date(courseData.schedule.endDate)
+                            .toISOString()
+                            .split("T")[0];
+                    }
                     setCourseData(courseData);
                 }
             } catch (error) {
-                console.error('Failed to fetch course data:', error);
+                console.error("Failed to fetch course data:", error);
             }
         }
 
         fetchData();
     }, [id]);
-
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setCourseData((prevState) => ({

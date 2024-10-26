@@ -8,6 +8,7 @@ import PaymentTable from "./PaymentTable";
 import StaffPaymentTable from "./StaffTable";
 import { fetchPaymentTeacherData } from "../../../../api/teacherapi"
 import { fetchPaymentStaffData } from "../../../../api/staffapi"
+import { useUser } from '@auth0/nextjs-auth0/client'; // Import Auth0 client hook
 
 export default function Payment() {
   const [filter, setFilter] = useState("");
@@ -15,6 +16,7 @@ export default function Payment() {
   const [select, setSelect] = useState(1);
   const [totalPayments, setTotalPayments] = useState(0);
   const [totalAmountPaid, setTotalAmountPaid] = useState(0);
+  const { user, error: authError, isLoading: userLoading } = useUser();
 
   const handleSelect = async (value) => {
     setSelect(value);
@@ -24,11 +26,11 @@ export default function Payment() {
     const fetchData = async () => {
       try {
         if (select === 1) {
-          const data = await fetchPaymentTeacherData();
+          const data = await fetchPaymentTeacherData(user.sub);
           setTotalPayments(data.totalPayments);
           setTotalAmountPaid(data.totalAmountPaid);
         } else if (select === 2) {
-          const data = await fetchPaymentStaffData();
+          const data = await fetchPaymentStaffData(user.sub);
           setTotalPayments(data.totalPayments);
           setTotalAmountPaid(data.totalAmountPaid);
         }

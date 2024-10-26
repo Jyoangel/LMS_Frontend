@@ -25,7 +25,13 @@ const EditDetails = ({ params, navigate }) => {
             const fetchData = async () => {
                 try {
                     const data = await fetchCalendarById(id);
-                    setCalendarData(data);
+
+                    // Format date if it's a valid date
+                    if (data.date) {
+                        data.date = new Date(data.date).toISOString().split("T")[0];
+                    }
+
+                    setCalendarData(data); // Set formatted data into calendarData state
                 } catch (error) {
                     console.error("Failed to fetch calendar data:", error);
                 }
@@ -33,6 +39,7 @@ const EditDetails = ({ params, navigate }) => {
             fetchData();
         }
     }, [id]);
+
 
     const handleChange = (e) => {
         const { name, value } = e.target;

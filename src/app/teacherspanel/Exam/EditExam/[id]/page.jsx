@@ -25,6 +25,12 @@ export default function ExamDetails({ params }) {
         const loadExamData = async () => {
             try {
                 const data = await fetchExamById(id);
+
+                // Format the date if it exists
+                if (data.date) {
+                    data.date = new Date(data.date).toISOString().split("T")[0];
+                }
+
                 setFormData(data);
             } catch (error) {
                 console.error("Failed to fetch exam data:", error);

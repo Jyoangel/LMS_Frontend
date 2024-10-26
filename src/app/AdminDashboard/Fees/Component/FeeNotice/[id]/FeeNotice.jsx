@@ -81,12 +81,12 @@ export default function FeeNotice({ studentID, onClose }) {
             </button>
           </div>
           <div className="flex flex-row gap-5 border-b border-gray-500 pb-5">
-            <Image src={adminUsers[0]?.picture} alt="Logo" className="h-[50px] w-[50px] rounded-full"
+            <Image src={adminUsers?.picture} alt="Logo" className="h-[50px] w-[50px] rounded-full"
               width={70} // Set width to avoid layout shift
               height={70} />
             <div className="flex flex-col gap-1">
               <h1 className="text-black text-lg font-semibold uppercase">
-                {adminUsers[0]?.name}
+                {adminUsers?.name}
               </h1>
               <p className="text-gray-400 uppercase text-sm leading-5 tracking-wider">
                 barauli gopalganj [ Bihar ]

@@ -63,6 +63,41 @@ export default function EditFeeMonth({ params }) {
     // handle submit and update 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        // Validation checks
+        if (!feeData.feeMonth) {
+            alert("Please select the fee month.");
+            return;
+        }
+
+        if (!feeData.feePaid || isNaN(feeData.feePaid) || parseFloat(feeData.feePaid) <= 0) {
+            alert("Please enter a valid fee amount.");
+            return;
+        }
+
+        if (feeData.otherFee && (isNaN(feeData.otherFee) || parseFloat(feeData.otherFee) < 0)) {
+            alert("Please enter a valid amount for other fees.");
+            return;
+        }
+
+        if (!feeData.paymentMode) {
+            alert("Please select a payment mode.");
+            return;
+        }
+
+        if (feeData.paymentMode === "Online" && !feeData.referenceNo) {
+            alert("Please provide a reference number for non-cash payments.");
+            return;
+        }
+
+        if (feeData.paymentMode === "Online" && !feeData.bankName) {
+            alert("Please provide a bank name for non-cash payments.");
+            return;
+        }
+
+        if (!feeData.receiptBy) {
+            alert("Please enter the name of the person receiving the payment.");
+            return;
+        }
         try {
             await updateFeeRecordByMonth(studentID, month, feeData);
             openModal();

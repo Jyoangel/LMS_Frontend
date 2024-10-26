@@ -24,11 +24,17 @@ export default function EditDetails({ params }) {
         createdBy: ""
     });
 
-    // call api to fetch intial assignment data 
+    // Call API to fetch initial assignment data 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const data = await fetchAssignmentById(id);
+
+                // Format dueDate if it's a valid date
+                if (data.dueDate) {
+                    data.dueDate = new Date(data.dueDate).toISOString().split("T")[0];
+                }
+
                 setFormData(data);
             } catch (error) {
                 console.error('Error fetching assignment data:', error);

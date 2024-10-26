@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { RxCrossCircled } from "react-icons/rx";
 import Image from "next/image";
 import logo from "../../logo.png";
-import { fetchAdmitCardByStudentID, fetchReportCardByStudentID, deleteAdmitCardData } from "../../../../../../../api/reportcardapi"; // api to fetch admitcard  report card by student ID and delete admit card  
+import { fetchAdmitCardByStudentID, fetchReportCardByStudentID, deleteAdmitCardData, deleteReportCardData } from "../../../../../../../api/reportcardapi"; // api to fetch admitcard  report card by student ID and delete admit card  
 import { fetchAdminUserByUserId } from "../../../../../../../api/adminUser";// use to fetch admin details
 import { format } from "date-fns";
 import Link from "next/link";
@@ -109,6 +109,19 @@ export default function FinalAdmitcard({ params, onClose }) {
     deleteAdmitCardData(admitCardData._id)
       .then(() => {
         alert('Admit card deleted successfully');
+        onClose(); // Close or redirect the user after deletion
+      })
+      .catch((error) => {
+        console.error('Error deleting admit card:', error);
+        setDeleteError(error.message);
+      });
+  };
+  const handleDeleteReportCard = () => {
+    if (!reportCardData?._id) return;
+
+    deleteReportCardData(reportCardData._id)
+      .then(() => {
+        alert('Report card deleted successfully');
         onClose(); // Close or redirect the user after deletion
       })
       .catch((error) => {
@@ -234,92 +247,109 @@ export default function FinalAdmitcard({ params, onClose }) {
           </button>
           {loadingReport && <p>Loading Report Card...</p>}
           {reportCardData ? (
-            <div className=" w-full h-full flex ">
-              <div
-                ref={noticeRef}
-                className="h-[720px] w-[700px] border border-blue-500 bg-white rounded-lg flex flex-col gap-3 p-5"
-              >
+            <>
+              < div className="flex gap-4 mb-4">
 
-                <div className="flex flex-row gap-20">
-                  <Image src={adminUsers?.picture} alt="Logo" className="h-[50px] w-[50px] rounded-full"
-                    width={70} // Set width to avoid layout shift
-                    height={70} />
-                  <h1 className="text-black text-lg font-bold">
-                    {adminUsers?.name}
-                  </h1>
-                </div>
-                <div className="grid grid-cols-2 w-full gap-5">
-                  <div className="flex flex-col gap-5">
-                    <h1 className="text-lg font-medium">
-                      Examination Roll Number:{" "}
-                      <span className="text-black text-lg font-bold">{reportCardData.rollNumber}</span>{" "}
-                    </h1>
-                    <h1 className="text-lg font-medium">
-                      Session:{" "}
-                      <span className="text-black text-lg font-bold">{reportCardData.session}</span>{" "}
-                    </h1>
-                    <h1 className="text-lg font-medium">
-                      Student Name:{" "}
-                      <span className="text-black text-lg font-bold">{reportCardData.studentID.name}</span>{" "}
-                    </h1>
-                    <h1 className="text-lg font-medium">
-                      Percentage:{" "}
-                      <span className="text-black text-lg font-bold">{reportCardData.percentage}</span>{" "}
-                    </h1>
+                <Link href={`/AdminDashboard/ReportCard/EditReportCard/${reportCardData._id}`}>
+                  <button className="bg-yellow-500 text-white px-4 py-2 rounded-lg">Edit Report Card</button>
+                </Link>
+                <button
+                  onClick={handleDeleteReportCard}
+                  className="bg-red-500 text-white px-4 py-2 rounded-lg"
+                >
+                  Delete Report Card
+                </button>
+              </div>
 
-                  </div>
-                  <div className="flex flex-col gap-5 ">
-                    <h1 className="text-lg font-medium">
-                      Examination:{" "}
-                      <span className="text-black text-lg font-bold">{reportCardData.type}</span>
-                    </h1>
-                    <h1 className="text-lg font-medium">
-                      Class: <span className="text-black text-lg font-bold">{reportCardData.studentID.class}</span>
-                    </h1>
-                    <h1 className="text-lg font-medium">
-                      Date of Birth:{" "}
-                      <span className="text-black text-lg font-bold">{reportCardData?.studentID.dateOfBirth ? format(new Date(reportCardData?.studentID.dateOfBirth), "yyyy-MM-dd") : "N/A"}</span>{" "}
-                    </h1>
-                    <h1 className="text-lg font-medium">
-                      Status:{" "}
-                      <span className="text-black text-lg font-bold">{reportCardData.status}</span>
+              <div className=" w-full h-full flex ">
+                <div
+                  ref={noticeRef}
+                  className="h-[720px] w-[700px] border border-blue-500 bg-white rounded-lg flex flex-col gap-3 p-5"
+                >
+
+                  <div className="flex flex-row gap-20">
+                    <Image src={adminUsers?.picture} alt="Logo" className="h-[50px] w-[50px] rounded-full"
+                      width={70} // Set width to avoid layout shift
+                      height={70} />
+                    <h1 className="text-black text-lg font-bold">
+                      {adminUsers?.name}
                     </h1>
                   </div>
-                </div>
-                <div className="flex flex-col">
-                  <table className="w-full border border-gray-300">
-                    <thead>
-                      <tr className="border border-gray-300">
-                        <th className="text-black text-lg border-r border-gray-300 py-2 px-5">Sr. no</th>
-                        <th className="text-black text-lg border-r border-gray-300 py-2">Subject Name</th>
-                        <th className="text-black text-lg py-2">Marks</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {reportCardData.subjects.map((subject, index) => (
-                        <tr key={index} className="border border-gray-300">
-                          <td className="text-black text-lg border-r border-gray-300 py-2 px-5">{index + 1}</td>
-                          <td className="text-black text-lg border-r border-gray-300 py-2">{subject.subjectName}</td>
-                          <td className="text-black text-lg py-2">{subject.marks}</td>
+                  <div className="grid grid-cols-2 w-full gap-5">
+                    <div className="flex flex-col gap-5">
+                      <h1 className="text-lg font-medium">
+                        Examination Roll Number:{" "}
+                        <span className="text-black text-lg font-bold">{reportCardData.rollNumber}</span>{" "}
+                      </h1>
+                      <h1 className="text-lg font-medium">
+                        Session:{" "}
+                        <span className="text-black text-lg font-bold">{reportCardData.session}</span>{" "}
+                      </h1>
+                      <h1 className="text-lg font-medium">
+                        Student Name:{" "}
+                        <span className="text-black text-lg font-bold">{reportCardData.studentID.name}</span>{" "}
+                      </h1>
+                      <h1 className="text-lg font-medium">
+                        Percentage:{" "}
+                        <span className="text-black text-lg font-bold">{reportCardData.percentage}</span>{" "}
+                      </h1>
+
+                    </div>
+                    <div className="flex flex-col gap-5 ">
+                      <h1 className="text-lg font-medium">
+                        Examination:{" "}
+                        <span className="text-black text-lg font-bold">{reportCardData.type}</span>
+                      </h1>
+                      <h1 className="text-lg font-medium">
+                        Class: <span className="text-black text-lg font-bold">{reportCardData.studentID.class}</span>
+                      </h1>
+                      <h1 className="text-lg font-medium">
+                        Date of Birth:{" "}
+                        <span className="text-black text-lg font-bold">{reportCardData?.studentID.dateOfBirth ? format(new Date(reportCardData?.studentID.dateOfBirth), "yyyy-MM-dd") : "N/A"}</span>{" "}
+                      </h1>
+                      <h1 className="text-lg font-medium">
+                        Status:{" "}
+                        <span className="text-black text-lg font-bold">{reportCardData.status}</span>
+                      </h1>
+                    </div>
+                  </div>
+                  <div className="flex flex-col">
+                    <table className="w-full border border-gray-300">
+                      <thead>
+                        <tr className="border border-gray-300">
+                          <th className="text-black text-lg border-r border-gray-300 py-2 px-5">Sr. no</th>
+                          <th className="text-black text-lg border-r border-gray-300 py-2">Subject Name</th>
+                          <th className="text-black text-lg py-2">Marks</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                  <div className="mt-4 flex flex-col gap-5">
-                    <p className="font-bold">Remarks</p>
-                    <input
-                      type="text"
-                      className="w-full p-2 border rounded"
-                      placeholder="Type here"
-                    />
+                      </thead>
+                      <tbody>
+                        {reportCardData.subjects.map((subject, index) => (
+                          <tr key={index} className="border border-gray-300">
+                            <td className="text-black text-lg border-r border-gray-300 py-2 px-5">{index + 1}</td>
+                            <td className="text-black text-lg border-r border-gray-300 py-2">{subject.subjectName}</td>
+                            <td className="text-black text-lg py-2">{subject.marks}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                    <div className="mt-4 flex flex-col gap-5">
+                      <p className="font-bold">Remarks</p>
+                      <input
+                        type="text"
+                        className="w-full p-2 border rounded"
+                        placeholder="Type here"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            </>
           ) : (
             !loadingReport && <p>{errorMessage}</p>
           )}
+
         </div>
+
 
       </div >
     </>

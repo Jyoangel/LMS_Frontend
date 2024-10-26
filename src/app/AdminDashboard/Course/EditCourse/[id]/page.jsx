@@ -34,15 +34,27 @@ export default function CourseEdit({ params }) {
             try {
                 const courseData = await fetchCourseById(id);
                 if (courseData) {
+                    // Format startDate and endDate if they are valid dates
+                    if (courseData.schedule?.startDate) {
+                        courseData.schedule.startDate = new Date(courseData.schedule.startDate)
+                            .toISOString()
+                            .split("T")[0];
+                    }
+                    if (courseData.schedule?.endDate) {
+                        courseData.schedule.endDate = new Date(courseData.schedule.endDate)
+                            .toISOString()
+                            .split("T")[0];
+                    }
                     setCourseData(courseData);
                 }
             } catch (error) {
-                console.error('Failed to fetch course data:', error);
+                console.error("Failed to fetch course data:", error);
             }
         }
 
         fetchData();
     }, [id]);
+
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -79,6 +91,21 @@ export default function CourseEdit({ params }) {
 
     const handleSubmit = async () => {
         console.log('Submitting form:', courseData);
+        if (!courseData.courseName || !courseData.courseCode || !courseData.primaryInstructorname || !courseData.instructorEmail || !courseData.schedule.startDate || !courseData.schedule.endDate || !courseData.courseDescription) {
+            alert("Please fill in all required fields.");
+            return;
+        }
+
+        // Convert startDate and endDate strings to Date objects
+        const startDate = new Date(courseData.schedule.startDate);
+        const endDate = new Date(courseData.schedule.endDate);
+
+        // Check that startDate is before endDate
+        if (startDate >= endDate) {
+            alert("The start date must be before the end date.");
+            return;
+        }
+
         try {
             const response = await updateCourseData(id, courseData);
             console.log('Response:', response);

@@ -155,25 +155,28 @@ export default function FeeSlip({ onClose, feeId }) {
                 Fee Month: {feeDetails.feeMonth}
               </h1>
             </div>
+            <div className="h-[30px] w-full bg-white flex flex-row items-center justify-between px-5">
+              <h1 className="text-sm text-black font-semibold"> Total Monthly Fee</h1>
+              <h1 className="text-sm text-black font-semibold">
+                Rs {feeDetails.studentID?.monthlyFee}
+              </h1>
+            </div>
+            <div className="h-[30px] w-full bg-white flex flex-row items-center justify-between px-5">
+              <h1 className="text-sm text-black font-semibold">Extra Fee This Month</h1>
+              <h1 className="text-sm text-black font-semibold">
+                Rs {feeDetails.extraFee}
+              </h1>
+            </div>
           </div>
+
           <div className="flex flex-col border-b border-gray-500">
             <div className="h-[30px] w-full bg-gray-300 flex flex-row items-center justify-between px-5">
               <h1 className="text-sm text-black font-semibold">Fee Type</h1>
               <h1 className="text-sm text-black font-semibold">Fee Amount</h1>
             </div>
 
-            <div className="h-[30px] w-full bg-white flex flex-row items-center justify-between px-5">
-              <h1 className="text-sm text-black font-semibold">Monthly Fee</h1>
-              <h1 className="text-sm text-black font-semibold">
-                Rs {feeDetails.studentID?.monthlyFee}
-              </h1>
-            </div>
-            <div className="h-[30px] w-full bg-white flex flex-row items-center justify-between px-5">
-              <h1 className="text-sm text-black font-semibold">Extra Fee</h1>
-              <h1 className="text-sm text-black font-semibold">
-                Rs {feeDetails.extraFee}
-              </h1>
-            </div>
+
+
             <div className="h-[30px] w-full bg-white flex flex-row items-center justify-between px-5">
               <h1 className="text-sm text-black font-semibold"> Fee Paid</h1>
               <h1 className="text-sm text-black font-semibold">
@@ -188,7 +191,7 @@ export default function FeeSlip({ onClose, feeId }) {
             </div>
             <div className="h-[30px] w-full bg-gray-200 flex flex-row items-center justify-between px-5">
               <h1 className="text-sm text-black font-semibold">
-                Total :  Rs {feeDetails.studentID?.totalFee}
+                Total Annual Fee :  Rs {feeDetails.studentID?.totalFee}
               </h1>
               <h1 className="text-sm text-black font-semibold">
                 Dues:  Rs {feeDetails.dueAmount}{" "}

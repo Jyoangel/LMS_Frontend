@@ -86,7 +86,7 @@ export default function TeacherManagementTable({ filter, searchTerm }) {
               <th className="py-4 px-6 text-left">Gender</th>
               <th className="py-4 px-6 text-left">Aadhar No</th>
               <th className="py-4 px-6 text-left">Father Name</th>
-              <th className="py-4 px-6 text-left">Contact No</th>
+              <th className="py-4 px-6 text-left"> Email</th>
               <th className="py-4 px-6 text-left">Action</th>
             </tr>
           </thead>

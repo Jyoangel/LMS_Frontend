@@ -34,6 +34,15 @@ export default function EditDetails({ params }) {
     const fetchData = async () => {
         try {
             const data = await fetchHomeWorkById(id);
+
+            // Format startDate and endDate if they exist
+            if (data.startDate) {
+                data.startDate = new Date(data.startDate).toISOString().split("T")[0];
+            }
+            if (data.endDate) {
+                data.endDate = new Date(data.endDate).toISOString().split("T")[0];
+            }
+
             setFormData(data);
         } catch (error) {
             console.error("Failed to fetch homework data:", error);

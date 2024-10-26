@@ -49,6 +49,24 @@ export default function EditLibrary({ params }) {
     // use to submit and update library data 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        // Basic validation
+        for (const key in formData) {
+            if (formData[key] === null || formData[key] === "") {
+                alert("All fields are required.");
+                return;
+            }
+        }
+
+        // Additional validation for specific fields
+        if (formData.title.length < 3) {
+            alert("Title must be at least 3 characters long.");
+            return;
+        }
+
+        if (formData.uploadBookPdf && formData.uploadBookPdf.size > 5 * 1024 * 1024) { // 5MB size limit
+            alert("Uploaded PDF file size should be less than 5MB.");
+            return;
+        }
         try {
             await updateLibraryData(id, formData);
             openModal();
