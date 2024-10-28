@@ -3,11 +3,14 @@ import { useState } from "react";
 import Successcard from "@/Components/Successcard";
 import Link from "next/link";
 import { FaArrowLeftLong } from "react-icons/fa6";
-import { addTranspotationData } from "../../../../../../api/transpotationapi"; // fetch api of transportation using studentID 
+import { addTranspotationData } from "../../../../../../api/transpotationapi";
+import { useUser } from '@auth0/nextjs-auth0/client';
+// fetch api of transportation using studentID 
 
 export default function AddTranspotation({ params }) {
   const { studentID } = params;
   const [isSelectOpen, setIsSelectOpen] = useState(false);
+  const { user, error, isLoading } = useUser();
   const [validationMessage, setValidationMessage] = useState("");
   const [formData, setFormData] = useState({
     studentID: studentID,
@@ -15,7 +18,8 @@ export default function AddTranspotation({ params }) {
     dropLocation: "",
     transportationFee: "",
     pickupTime: "",
-    dropTime: ""
+    dropTime: "",
+    userId: user ? user.sub : '',
   });
 
   const handleChange = (e) => {

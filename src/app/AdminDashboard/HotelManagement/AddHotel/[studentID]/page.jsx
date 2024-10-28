@@ -5,16 +5,20 @@ import Successcard from "@/Components/Successcard";
 import Link from "next/link";
 import { FaArrowLeftLong } from "react-icons/fa6";
 import { addHotelData } from "../../../../../../api/hotelapi"; // addd and fetch api
+import { useUser } from '@auth0/nextjs-auth0/client';
+
 
 export default function AddHotel({ params }) {
   const { studentID } = params;
   const [isSelectOpen, setIsSelectOpen] = useState(false);
+  const { user, error, isLoading } = useUser();
   const [formData, setFormData] = useState({
     studentID: studentID,
     typeOfRoom: "",
     floor: "",
     zone: "",
-    price: ""
+    price: "",
+    userId: user ? user.sub : '',
   });
 
   const handleChange = (e) => {
