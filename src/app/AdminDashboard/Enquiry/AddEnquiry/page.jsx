@@ -135,7 +135,7 @@ export default function AddEnquiry() {
                 value={formData.contactNumber}
                 onChange={handleChange}
                 style={{
-                  color: validation.isEmailValid ? 'initial' : 'red', // Change border color based on validity
+                  color: validation.isContactNumberValid ? 'initial' : 'red', // Change border color based on validity
                 }}
                 placeholder="Type here"
                 className="border border-gray-300 rounded-md w-full py-3 px-5 outline-none"

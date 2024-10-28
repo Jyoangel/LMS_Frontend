@@ -18,7 +18,7 @@ export default function StudentDetails() {
     setisSelectOpen(false);
   };
 
-  if (isLoading) return <div>Loading...</div>; // Show loading state
+  //if (isLoading) return <div>Loading...</div>; // Show loading state
 
   const initialFormData = {
     studentID: '',
@@ -129,21 +129,49 @@ export default function StudentDetails() {
       setValidation((prev) => ({ ...prev, isAadharValid: true }));
     }
   };
-  // handle submit 
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    //Validation checks
-    if (!formData.studentID) {
-      alert("Student ID is required.");
+    const {
+      studentID,
+      formNumber,
+      admissionNumber,
+      class: className,
+      admissionType,
+      name,
+      nationality,
+      motherTongue,
+      dateOfBirth,
+      gender,
+      religion,
+      caste,
+      bloodGroup,
+      aadharNumber,
+      contactNumber,
+      email,
+      address,
+      totalFee,
+      session,
+      parent,
+      localGuardian
+    } = formData;
+
+    if (!studentID || !formNumber || !admissionNumber || !className || !admissionType || !name || !nationality ||
+      !motherTongue || !dateOfBirth || !gender || !religion || !caste || !bloodGroup || !aadharNumber ||
+      !contactNumber || !email || !address || !totalFee || !session || !parent || !localGuardian) {
+      alert("Please fill in all required fields in the main section.");
       return;
     }
 
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const contactNumberPattern = /^\d{10}$/;
+    const aadharPattern = /^(?!.*(\d)\1{11})\d{12}$/;
 
-    const email = formData.email;
+    // Check individual fields and update validity state accordingly
 
     // Validate email format
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    //const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailPattern.test(email)) {
       setValidation({ isEmailValid: false }); // Update email validity
       alert("Please enter a valid email address.");
@@ -151,7 +179,7 @@ export default function StudentDetails() {
     }
 
     // Validate contact number (for simplicity, let's assume it should be a 10-digit number)
-    const contactNumberPattern = /^\d{10}$/;
+    //const contactNumberPattern = /^\d{10}$/;
     if (!contactNumberPattern.test(contactNumber)) {
       setValidation({ isContactNumberValid: false }); // Update contact number validity
       alert("Please enter a valid contact number (10 digits).");
@@ -159,7 +187,7 @@ export default function StudentDetails() {
     }
 
     // Validate aadhar number (12-digit number for India)
-    const aadharPattern = /^(?!.*(\d)\1{11})\d{12}$/;
+    //const aadharPattern = /^(?!.*(\d)\1{11})\d{12}$/;
     if (!aadharPattern.test(aadharNumber)) {
       setValidation({ isAadharValid: false });
       alert("Please enter a valid 12-digit Aadhar number.");
@@ -204,26 +232,15 @@ export default function StudentDetails() {
       alert("Please enter a valid 12-digit guardian Aadhar number.");
       return;
     }
-    // Required fields validation
-    const requiredFields = ['studentID', 'formNumber', 'admissionNumber', 'class', 'admissionType', 'name', 'nationality', 'motherTongue', 'dateOfBirth', 'gender', 'religion', 'caste', 'bloodGroup', 'aadharNumber', 'contactNumber', 'email', 'address', 'totalFee', 'session'];
-    const missingFields = requiredFields.filter(field => !formData[field]);
-
-    if (missingFields.length > 0) {
-      alert("Please fill in all required fields.");
-      return;
-    }
 
     try {
-      // Call the API to add the student data
       await addStudentData(formData);
       console.log('Student created successfully');
-      // Reset form data
       setFormData(initialFormData);
+      setValidation({ isContactNumberValid: true, isEmailValid: true, isAadharValid: true });
       openModal();
-      // You can add code here to refresh the student list in UserManagementTable if needed
     } catch (error) {
       console.error('Error creating student:', error);
-      // Handle error (e.g., show error message)
       alert(`Error: ${error.message}`);
     }
   };
@@ -506,7 +523,7 @@ export default function StudentDetails() {
                   value={formData.aadharNumber}
                   onChange={handleChange}
                   style={{
-                    color: validation.isEmailValid ? 'initial' : 'red', // Change border color based on validity
+                    color: validation.isAadharValid ? 'initial' : 'red', // Change border color based on validity
                   }}
                   className="border border-gray-300 rounded-md w-full py-3 px-5 outline-none"
                 />
@@ -525,7 +542,7 @@ export default function StudentDetails() {
                   value={formData.contactNumber}
                   onChange={handleChange}
                   style={{
-                    color: validation.isEmailValid ? 'initial' : 'red', // Change border color based on validity
+                    color: validation.isContactNumberValid ? 'initial' : 'red', // Change border color based on validity
                   }}
                   className="border border-gray-300 rounded-md w-full py-3 px-5 outline-none"
                 />
@@ -630,7 +647,7 @@ export default function StudentDetails() {
                   value={formData.parent.fatherContactNumber}
                   onChange={handleParentChange}
                   style={{
-                    color: validation.isEmailValid ? 'initial' : 'red', // Change border color based on validity
+                    color: validation.isContactNumberValid ? 'initial' : 'red', // Change border color based on validity
                   }}
                   className="border border-gray-300 rounded-md w-full py-3 px-5 outline-none"
                 />
@@ -648,7 +665,7 @@ export default function StudentDetails() {
                   value={formData.parent.fatherAadharNumber}
                   onChange={handleParentChange}
                   style={{
-                    color: validation.isEmailValid ? 'initial' : 'red', // Change border color based on validity
+                    color: validation.isAadharValid ? 'initial' : 'red', // Change border color based on validity
                   }}
                   className="border border-gray-300 rounded-md w-full py-3 px-5 outline-none"
                 />
@@ -696,7 +713,7 @@ export default function StudentDetails() {
                   value={formData.parent.motherContactNumber}
                   onChange={handleParentChange}
                   style={{
-                    color: validation.isEmailValid ? 'initial' : 'red', // Change border color based on validity
+                    color: validation.isContactNumberValid ? 'initial' : 'red', // Change border color based on validity
                   }}
                   className="border border-gray-300 rounded-md w-full py-3 px-5 outline-none"
                 />
@@ -714,7 +731,7 @@ export default function StudentDetails() {
                   value={formData.parent.motherAadharNumber}
                   onChange={handleParentChange}
                   style={{
-                    color: validation.isEmailValid ? 'initial' : 'red', // Change border color based on validity
+                    color: validation.isAadharValid ? 'initial' : 'red', // Change border color based on validity
                   }}
                   className="border border-gray-300 rounded-md w-full py-3 px-5 outline-none"
                 />
@@ -807,7 +824,7 @@ export default function StudentDetails() {
                   value={formData.localGuardian.guardianContactNumber}
                   onChange={handleLocalGuardianChange}
                   style={{
-                    color: validation.isEmailValid ? 'initial' : 'red', // Change border color based on validity
+                    color: validation.isContactNumberValid ? 'initial' : 'red', // Change border color based on validity
                   }}
                   className="border border-gray-300 rounded-md w-full py-3 px-5 outline-none"
                 />
@@ -823,7 +840,7 @@ export default function StudentDetails() {
                   value={formData.localGuardian.guardianAadharNumber}
                   onChange={handleLocalGuardianChange}
                   style={{
-                    color: validation.isEmailValid ? 'initial' : 'red', // Change border color based on validity
+                    color: validation.isAadharValid ? 'initial' : 'red', // Change border color based on validity
                   }}
                   className="border border-gray-300 rounded-md w-full py-3 px-5 outline-none"
                 />

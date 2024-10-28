@@ -91,6 +91,11 @@ const StaffDetail = ({ params }) => {
                 [name]: value
             }
         }));
+
+        if (name === "contactNumber") {
+            // Reset validity for emergency contact number
+            setValidation((prev) => ({ ...prev, isContactNumberValid: true }));
+        }
     };
 
     //  update staff 
@@ -133,6 +138,8 @@ const StaffDetail = ({ params }) => {
             alert("Please enter a valid 10-digit emergency contact number.");
             return;
         }
+        // Reset validity if both fields are correct
+        setValidation({ isContactNumberValid: true, isEmailValid: true, isAadharValid: true });
 
         // Validate salary (non-negative number)
         if (isNaN(salary) || Number(salary) <= 0) {
@@ -233,7 +240,7 @@ const StaffDetail = ({ params }) => {
                                 value={formData.contactNumber}
                                 onChange={handleChange}
                                 style={{
-                                    color: validation.isEmailValid ? 'initial' : 'red', // Change border color based on validity
+                                    color: validation.isContactNumberValid ? 'initial' : 'red', // Change border color based on validity
                                 }}
                                 className="border border-gray-300 rounded-md w-full py-3 px-5 outline-none"
                             />
@@ -291,7 +298,7 @@ const StaffDetail = ({ params }) => {
                                 value={formData.aadharNumber}
                                 onChange={handleChange}
                                 style={{
-                                    color: validation.isEmailValid ? 'initial' : 'red', // Change border color based on validity
+                                    color: validation.isAadharValid ? 'initial' : 'red', // Change border color based on validity
                                 }}
                                 className="border border-gray-300 rounded-md w-full py-3 px-5 outline-none"
                             />
@@ -332,6 +339,9 @@ const StaffDetail = ({ params }) => {
                                 name="contactNumber"
                                 value={formData.emergencyContact.contactNumber}
                                 onChange={handleEmergencyContactChange}
+                                style={{
+                                    color: validation.isContactNumberValid ? 'initial' : 'red', // Change border color based on validity
+                                }}
                                 className="border border-gray-300 rounded-md w-full py-3 px-5 outline-none"
                             />
                         </div>

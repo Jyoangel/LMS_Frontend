@@ -48,6 +48,11 @@ export default function UpdateDetails({ params }) {
             guardianAddress: '',
         },
     });
+    const [validation, setValidation] = useState({
+        isContactNumberValid: true,
+        isEmailValid: true,
+        isAadharValid: true,
+    });
     const [isSelectOpen, setisSelectOpen] = useState(false);
     // call api o fetch initaial data in form 
     useEffect(() => {
@@ -83,41 +88,171 @@ export default function UpdateDetails({ params }) {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData({
-            ...formData,
+
+        // Update form data
+        setFormData((prevData) => ({
+            ...prevData,
             [name]: value,
-        });
+        }));
+
+        // Reset validity on change for contact number and email
+        if (name === "contactNumber") {
+            setValidation((prev) => ({ ...prev, isContactNumberValid: true }));
+        } else if (name === "email") {
+            setValidation((prev) => ({ ...prev, isEmailValid: true }));
+        } else if (name === "aadharNumber") {
+            setValidation((prev) => ({ ...prev, isAadharValid: true }));
+        }
     };
 
     const handleParentChange = (e) => {
         const { name, value } = e.target;
-        setFormData({
-            ...formData,
+        setFormData((prevData) => ({
+            ...prevData,
             parent: {
-                ...formData.parent,
-                [name]: value,
-            },
-        });
+                ...prevData.parent,
+                [name]: value
+            }
+        }));
+
+        // Reset validity on change for parent contact number and Aadhar number
+        if (name === "fatherContactNumber") {
+            setValidation((prev) => ({ ...prev, isContactNumberValid: true }));
+        } else if (name === "motherContactNumber") {
+            setValidation((prev) => ({ ...prev, isContactNumberValid: true }));
+        } else if (name === "fatherAadharNumber") {
+            setValidation((prev) => ({ ...prev, isAadharValid: true }));
+        } else if (name === "motherAadharNumber") {
+            setValidation((prev) => ({ ...prev, isAadharValid: true }));
+        }
     };
 
+    // Add similar handle change functions for local guardian if needed
     const handleLocalGuardianChange = (e) => {
         const { name, value } = e.target;
-        setFormData({
-            ...formData,
+        setFormData((prevData) => ({
+            ...prevData,
             localGuardian: {
-                ...formData.localGuardian,
-                [name]: value,
-            },
-        });
-    };
+                ...prevData.localGuardian,
+                [name]: value
+            }
+        }));
 
+        // Reset validity on change for local guardian contact number and Aadhar number
+        if (name === "guardianContactNumber") {
+            setValidation((prev) => ({ ...prev, isContactNumberValid: true }));
+        } else if (name === "guardianAadharNumber") {
+            setValidation((prev) => ({ ...prev, isAadharValid: true }));
+        }
+    };
     // handle submit and update student 
 
     const handleUpdate = async (e) => {
         e.preventDefault();
+
+        const {
+            studentID,
+            formNumber,
+            admissionNumber,
+            class: className,
+            admissionType,
+            name,
+            nationality,
+            motherTongue,
+            dateOfBirth,
+            gender,
+            religion,
+            caste,
+            bloodGroup,
+            aadharNumber,
+            contactNumber,
+            email,
+            address,
+            totalFee,
+            session,
+            parent,
+            localGuardian
+        } = formData;
+
+        if (!studentID || !formNumber || !admissionNumber || !className || !admissionType || !name || !nationality ||
+            !motherTongue || !dateOfBirth || !gender || !religion || !caste || !bloodGroup || !aadharNumber ||
+            !contactNumber || !email || !address || !totalFee || !session || !parent || !localGuardian) {
+            alert("Please fill in all required fields in the main section.");
+            return;
+        }
+
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const contactNumberPattern = /^\d{10}$/;
+        const aadharPattern = /^(?!.*(\d)\1{11})\d{12}$/;
+
+        // Check individual fields and update validity state accordingly
+
+        // Validate email format
+        //const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailPattern.test(email)) {
+            setValidation({ isEmailValid: false }); // Update email validity
+            alert("Please enter a valid email address.");
+            return;
+        }
+
+        // Validate contact number (for simplicity, let's assume it should be a 10-digit number)
+        //const contactNumberPattern = /^\d{10}$/;
+        if (!contactNumberPattern.test(contactNumber)) {
+            setValidation({ isContactNumberValid: false }); // Update contact number validity
+            alert("Please enter a valid contact number (10 digits).");
+            return;
+        }
+
+        // Validate aadhar number (12-digit number for India)
+        //const aadharPattern = /^(?!.*(\d)\1{11})\d{12}$/;
+        if (!aadharPattern.test(aadharNumber)) {
+            setValidation({ isAadharValid: false });
+            alert("Please enter a valid 12-digit Aadhar number.");
+            return;
+        }
+        // Validate parent contact numbers
+        if (formData.parent.fatherContactNumber && !contactNumberPattern.test(formData.parent.fatherContactNumber)) {
+            setValidation({ isContactNumberValid: false });
+            alert("Please enter a valid 10-digit father contact number.");
+            return;
+        }
+
+        if (formData.parent.motherContactNumber && !contactNumberPattern.test(formData.parent.motherContactNumber)) {
+            setValidation({ isContactNumberValid: false });
+            alert("Please enter a valid 10-digit mother contact number.");
+            return;
+        }
+
+        // Validate parent Aadhar numbers
+        if (formData.parent.fatherAadharNumber && !aadharPattern.test(formData.parent.fatherAadharNumber)) {
+            setValidation({ isAadharValid: false });
+            alert("Please enter a valid 12-digit father Aadhar number.");
+            return;
+        }
+
+        if (formData.parent.motherAadharNumber && !aadharPattern.test(formData.parent.motherAadharNumber)) {
+            setValidation({ isAadharValid: false });
+            alert("Please enter a valid 12-digit mother Aadhar number.");
+            return;
+        }
+
+        // Validate local guardian contact number
+        if (formData.localGuardian.guardianContactNumber && !contactNumberPattern.test(formData.localGuardian.guardianContactNumber)) {
+            setValidation({ isContactNumberValid: false });
+            alert("Please enter a valid 10-digit guardian contact number.");
+            return;
+        }
+
+        // Validate local guardian Aadhar number
+        if (formData.localGuardian.guardianAadharNumber && !aadharPattern.test(formData.localGuardian.guardianAadharNumber)) {
+            setValidation({ isAadharValid: false });
+            alert("Please enter a valid 12-digit guardian Aadhar number.");
+            return;
+        }
         try {
             // Perform update operation using formData and studentID
             await updateStudentData(studentID, formData);
+            setValidation({ isContactNumberValid: true, isEmailValid: true, isAadharValid: true });
             openModal(); // Optionally open a modal upon successful update
         } catch (error) {
             console.error('Failed to update student data:', error.message);
@@ -383,6 +518,9 @@ export default function UpdateDetails({ params }) {
                                     name="aadharNumber"
                                     value={formData.aadharNumber}
                                     onChange={handleChange}
+                                    style={{
+                                        color: validation.isAadharValid ? 'initial' : 'red', // Change border color based on validity
+                                    }}
                                     className="border border-gray-300 rounded-md w-full py-3 px-5 outline-none"
                                 />
                             </div>
@@ -398,6 +536,9 @@ export default function UpdateDetails({ params }) {
                                     name="contactNumber"
                                     value={formData.contactNumber}
                                     onChange={handleChange}
+                                    style={{
+                                        color: validation.isContactNumberValid ? 'initial' : 'red', // Change border color based on validity
+                                    }}
                                     className="border border-gray-300 rounded-md w-full py-3 px-5 outline-none"
                                 />
                             </div>
@@ -411,6 +552,9 @@ export default function UpdateDetails({ params }) {
                                     name="email"
                                     value={formData.email}
                                     onChange={handleChange}
+                                    style={{
+                                        color: validation.isEmailValid ? 'initial' : 'red', // Change border color based on validity
+                                    }}
                                     className="border border-gray-300 rounded-md w-full py-3 px-5 outline-none"
                                 />
                             </div>
@@ -460,6 +604,9 @@ export default function UpdateDetails({ params }) {
                                     name="fatherContactNumber"
                                     value={formData.parent.fatherContactNumber}
                                     onChange={handleParentChange}
+                                    style={{
+                                        color: validation.isContactNumberValid ? 'initial' : 'red', // Change border color based on validity
+                                    }}
                                     className="border border-gray-300 rounded-md w-full py-3 px-5 outline-none"
                                 />
                             </div>
@@ -475,6 +622,9 @@ export default function UpdateDetails({ params }) {
                                     name="fatherAadharNumber"
                                     value={formData.parent.fatherAadharNumber}
                                     onChange={handleParentChange}
+                                    style={{
+                                        color: validation.isAadharValid ? 'initial' : 'red', // Change border color based on validity
+                                    }}
                                     className="border border-gray-300 rounded-md w-full py-3 px-5 outline-none"
                                 />
                             </div>
@@ -520,6 +670,9 @@ export default function UpdateDetails({ params }) {
                                     name="motherContactNumber"
                                     value={formData.parent.motherContactNumber}
                                     onChange={handleParentChange}
+                                    style={{
+                                        color: validation.isContactNumberValid ? 'initial' : 'red', // Change border color based on validity
+                                    }}
                                     className="border border-gray-300 rounded-md w-full py-3 px-5 outline-none"
                                 />
                             </div>
@@ -535,6 +688,9 @@ export default function UpdateDetails({ params }) {
                                     name="motherAadharNumber"
                                     value={formData.parent.motherAadharNumber}
                                     onChange={handleParentChange}
+                                    style={{
+                                        color: validation.isAadharValid ? 'initial' : 'red', // Change border color based on validity
+                                    }}
                                     className="border border-gray-300 rounded-md w-full py-3 px-5 outline-none"
                                 />
                             </div>
@@ -625,6 +781,9 @@ export default function UpdateDetails({ params }) {
                                     name="guardianContactNumber"
                                     value={formData.localGuardian.guardianContactNumber}
                                     onChange={handleLocalGuardianChange}
+                                    style={{
+                                        color: validation.isContactNumberValid ? 'initial' : 'red', // Change border color based on validity
+                                    }}
                                     className="border border-gray-300 rounded-md w-full py-3 px-5 outline-none"
                                 />
                             </div>
@@ -638,6 +797,9 @@ export default function UpdateDetails({ params }) {
                                     name="guardianAadharNumber"
                                     value={formData.localGuardian.guardianAadharNumber}
                                     onChange={handleLocalGuardianChange}
+                                    style={{
+                                        color: validation.isAadharValid ? 'initial' : 'red', // Change border color based on validity
+                                    }}
                                     className="border border-gray-300 rounded-md w-full py-3 px-5 outline-none"
                                 />
                             </div>

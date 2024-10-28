@@ -127,6 +127,11 @@ const StaffDetail = () => {
             return;
         }
 
+
+        // Reset validity if both fields are correct
+        setValidation({ isContactNumberValid: true, isEmailValid: true, isAadharValid: true });
+
+
         // Validate salary (non-negative number)
         if (isNaN(salary) || Number(salary) <= 0) {
             alert("Please enter a valid, positive salary amount.");
@@ -232,7 +237,7 @@ const StaffDetail = () => {
                                 value={formData.contactNumber}
                                 onChange={handleChange}
                                 style={{
-                                    color: validation.isEmailValid ? 'initial' : 'red', // Change border color based on validity
+                                    color: validation.isContactNumberValid ? 'initial' : 'red', // Change border color based on validity
                                 }}
                                 className="border border-gray-300 rounded-md w-full py-3 px-5 outline-none"
                             />
@@ -290,7 +295,7 @@ const StaffDetail = () => {
                                 value={formData.aadharNumber}
                                 onChange={handleChange}
                                 style={{
-                                    color: validation.isEmailValid ? 'initial' : 'red', // Change border color based on validity
+                                    color: validation.isAadharValid ? 'initial' : 'red', // Change border color based on validity
                                 }}
                                 className="border border-gray-300 rounded-md w-full py-3 px-5 outline-none"
                             />
@@ -332,7 +337,7 @@ const StaffDetail = () => {
                                 value={formData.emergencyContact.contactNumber}
                                 onChange={handleEmergencyContactChange}
                                 style={{
-                                    color: validation.isEmailValid ? 'initial' : 'red', // Change border color based on validity
+                                    color: validation.isContactNumberValid ? 'initial' : 'red', // Change border color based on validity
                                 }}
                                 className="border border-gray-300 rounded-md w-full py-3 px-5 outline-none"
                             />
@@ -382,7 +387,7 @@ const StaffDetail = () => {
                             <label htmlFor="salary" className="text-lg font-normal text-black">Salary*</label>
                             <input
                                 id="salary"
-                                type="number"
+                                type="text"
                                 name="salary"
                                 value={formData.salary}
                                 onChange={handleChange}

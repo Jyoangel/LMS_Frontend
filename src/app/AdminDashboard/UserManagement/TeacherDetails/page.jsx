@@ -122,14 +122,31 @@ const TeacherDetail = () => {
     // handle submit and call the api to add taeacher data
     const handleSubmit = async (event) => {
         event.preventDefault();
-        const requiredFields = ["name", "dateOfBirth", "gender", "contactNumber", "email", "aadharNumber", "address"];
-        const hasEmptyFields = requiredFields.some(field => !formData[field]);
 
-        if (hasEmptyFields) {
+        const { teacherID,
+            name,
+            dateOfBirth,
+            gender,
+            contactNumber,
+            email,
+            aadharNumber,
+            address,
+            subjectTaught,
+            assignedClass,
+            gradeLevelTaught,
+            department,
+            highestDegreeEarned,
+            instituteName,
+            yearOfGraduation,
+            emergencyContact,
+            salary,
+            parent } = formData;
+
+        // Client-side validation
+        if (!teacherID || !name || !dateOfBirth || !gender || !contactNumber || !email || !aadharNumber || !address || !subjectTaught || !assignedClass || !gradeLevelTaught || !department || !highestDegreeEarned || !instituteName || !yearOfGraduation || !salary || !parent) {
             alert("Please fill in all required fields.");
             return;
         }
-
         // Validate email format
         const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailPattern.test(email)) {
@@ -188,6 +205,9 @@ const TeacherDetail = () => {
             alert("Please enter a valid 10-digit emergency contact number.");
             return;
         }
+
+        // Reset validity if both fields are correct
+        setValidation({ isContactNumberValid: true, isEmailValid: true, isAadharValid: true });
 
         try {
             await addTeacherData(formData);
@@ -283,7 +303,7 @@ const TeacherDetail = () => {
                                 value={formData.contactNumber}
                                 onChange={handleChange}
                                 style={{
-                                    color: validation.isEmailValid ? 'initial' : 'red', // Change border color based on validity
+                                    color: validation.isContactNumberValid ? 'initial' : 'red', // Change border color based on validity
                                 }}
                                 className="border border-gray-300 rounded-md w-full py-3 px-5 outline-none"
                             />
@@ -315,7 +335,7 @@ const TeacherDetail = () => {
                                 value={formData.aadharNumber}
                                 onChange={handleChange}
                                 style={{
-                                    color: validation.isEmailValid ? 'initial' : 'red', // Change border color based on validity
+                                    color: validation.isAadharValid ? 'initial' : 'red', // Change border color based on validity
                                 }}
                                 className="border border-gray-300 rounded-md w-full py-3 px-5 outline-none"
                             />
@@ -435,7 +455,7 @@ const TeacherDetail = () => {
                                 value={formData.emergencyContact.contactNumber}
                                 onChange={handleEmergencyContactChange}
                                 style={{
-                                    color: validation.isEmailValid ? 'initial' : 'red', // Change border color based on validity
+                                    color: validation.isContactNumberValid ? 'initial' : 'red', // Change border color based on validity
                                 }}
                                 className="border border-gray-300 rounded-md w-full py-3 px-5 outline-none"
                             />
@@ -450,9 +470,7 @@ const TeacherDetail = () => {
                                 name="relationship"
                                 value={formData.emergencyContact.relationship}
                                 onChange={handleEmergencyContactChange}
-                                style={{
-                                    color: validation.isEmailValid ? 'initial' : 'red', // Change border color based on validity
-                                }}
+
                                 className="border border-gray-300 rounded-md w-full py-3 px-5 outline-none"
                             />
                         </div>
@@ -496,7 +514,7 @@ const TeacherDetail = () => {
                                 value={formData.parent.fatherContactNumber}
                                 onChange={handleParentChange}
                                 style={{
-                                    color: validation.isEmailValid ? 'initial' : 'red', // Change border color based on validity
+                                    color: validation.isContactNumberValid ? 'initial' : 'red', // Change border color based on validity
                                 }}
                                 className="border border-gray-300 rounded-md w-full py-3 px-5 outline-none"
                             />
@@ -514,7 +532,7 @@ const TeacherDetail = () => {
                                 value={formData.parent.fatherAadharNumber}
                                 onChange={handleParentChange}
                                 style={{
-                                    color: validation.isEmailValid ? 'initial' : 'red', // Change border color based on validity
+                                    color: validation.isAadharValid ? 'initial' : 'red', // Change border color based on validity
                                 }}
                                 className="border border-gray-300 rounded-md w-full py-3 px-5 outline-none"
                             />
@@ -563,7 +581,7 @@ const TeacherDetail = () => {
                                 value={formData.parent.motherContactNumber}
                                 onChange={handleParentChange}
                                 style={{
-                                    color: validation.isEmailValid ? 'initial' : 'red', // Change border color based on validity
+                                    color: validation.isContactNumberValid ? 'initial' : 'red', // Change border color based on validity
                                 }}
                                 className="border border-gray-300 rounded-md w-full py-3 px-5 outline-none"
                             />
@@ -581,7 +599,7 @@ const TeacherDetail = () => {
                                 value={formData.parent.motherAadharNumber}
                                 onChange={handleParentChange}
                                 style={{
-                                    color: validation.isEmailValid ? 'initial' : 'red', // Change border color based on validity
+                                    color: validation.isAadharValid ? 'initial' : 'red', // Change border color based on validity
                                 }}
                                 className="border border-gray-300 rounded-md w-full py-3 px-5 outline-none"
                             />
