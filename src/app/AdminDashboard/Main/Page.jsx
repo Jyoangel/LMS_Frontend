@@ -264,7 +264,7 @@ export default function Main() {
               {topStudents.map((student) => (
                 <StudentCard
                   key={student.id} // assuming each student has a unique id
-                  name={student.name}
+                  name={student.studentID.name}
                   percentage={student.percentage}
                 />
               ))}
