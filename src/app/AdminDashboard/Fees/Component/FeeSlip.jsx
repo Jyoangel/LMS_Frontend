@@ -222,7 +222,7 @@ export default function FeeSlip({ onClose, feeId }) {
           </div>
 
           <div className="flex flex-row items-center justify-between px-5">
-            <h1 className="text-red-500 text-sm font-semibold">Student Copy</h1>
+
             <h1 className="text-black text-sm font-semibold">
               Print: {new Date(feeDetails.printDate).toLocaleString()}
             </h1>

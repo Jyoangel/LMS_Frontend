@@ -114,6 +114,24 @@ export default function Sidenavbar() {
           <h1>Students</h1>
         </button>
       </Link>
+      <Link href="/teacherspanel/Classes">
+        <button
+          className={`${isActive("/teacherspanel/Classes")
+            ? "bg-blue-600 text-white"
+            : "text-black"
+            } h-[50px] w-full px-5 py-3 flex gap-3`}
+        >
+          <Image
+            src={calender}
+            alt="student"
+            className={`h-6 w-6 ${isActive("/teacherspanel/Classes") ? "invert-0" : "invert"
+              }`}
+          />
+          <h1>Homework</h1>
+        </button>
+      </Link>
+
+
 
       <Link href="/teacherspanel/Chats">
         <button

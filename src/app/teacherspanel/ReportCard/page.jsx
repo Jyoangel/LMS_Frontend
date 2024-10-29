@@ -61,7 +61,7 @@ export default function ReportCard() {
           <h1 className="text-base font-medium">Total Student Card:{totalStudents} </h1>
           <div className="flex items-center justify-center gap-5">
 
-            <Link href={"/AdminDashboard/ReportCard/SelectCard"}>
+            <Link href={"/teacherspanel/ReportCard/SelectCard"}>
               <button className="text-base font-semibold text-white bg-blue-500 px-4 py-2 rounded-lg">
                 Add New
               </button>

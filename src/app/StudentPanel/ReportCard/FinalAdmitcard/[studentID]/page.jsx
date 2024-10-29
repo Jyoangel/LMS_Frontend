@@ -176,7 +176,7 @@ export default function FinalAdmitcard({ params, onClose }) {
                     </div>
                     {/* Right Column */}
                     <div className="flex flex-col gap-5">
-                      <h1 className="text-lg font-medium">School Name: <span className="text-black text-lg font-bold">{admitCardData?.school_name}</span></h1>
+                      <h1 className="text-lg font-medium">School Name: <span className="text-black text-lg font-bold">{adminUsers?.name}</span></h1>
                       <h1 className="text-lg font-medium">Examination: <span className="text-black text-lg font-bold">{admitCardData?.examination}</span></h1>
                       <h1 className="text-lg font-medium">Class: <span className="text-black text-lg font-bold">{admitCardData?.studentID?.class}</span></h1>
                       <h1 className="text-lg font-medium">End Date: <span className="text-black text-lg font-bold">{admitCardData?.enddate ? format(new Date(admitCardData?.enddate), "yyyy-MM-dd") : "N/A"}</span></h1>
@@ -248,7 +248,7 @@ export default function FinalAdmitcard({ params, onClose }) {
                     </h1>
                     <h1 className="text-lg font-medium">
                       Session:{" "}
-                      <span className="text-black text-lg font-bold">{reportCardData.session}</span>{" "}
+                      <span className="text-black text-lg font-bold">{reportCardData.studentID.session}</span>{" "}
                     </h1>
                     <h1 className="text-lg font-medium">
                       Student Name:{" "}
