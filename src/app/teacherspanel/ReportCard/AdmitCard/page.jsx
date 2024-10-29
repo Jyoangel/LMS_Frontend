@@ -13,19 +13,29 @@ export default function AdmitCard() {
   const [userId, setUserId] = useState(null);
   const { user, error: authError, isLoading: userLoading } = useUser();
 
+  const [formData, setFormData] = useState({
+
+    examination: "",
+    userId: null,
+    class: "",
+    startdate: "",
+    enddate: "",
+    examstarting_time: "",
+    examending_time: "",
+    examsubjects: [{ subject: "", examination_date: "" }],
+  });
 
 
   // Check user role and retrieve userId
   useEffect(() => {
     async function getUserRole() {
-      const email = user?.email; // Ensure user email is available
-      if (!email) return; // Prevent unnecessary fetch
+      const email = user?.email;
+      if (!email) return;
 
       try {
-        const result = await checkUserRole(email); // Use the imported function
-
+        const result = await checkUserRole(email);
         if (result.exists) {
-          setUserId(result.userId); // Set userId from the response
+          setUserId(result.userId);
         } else {
           setError("User not found or does not exist.");
         }
@@ -38,20 +48,15 @@ export default function AdmitCard() {
     getUserRole();
   }, [user]);
 
-  const [formData, setFormData] = useState({
-
-    examination: "",
-    userId: userId,
-    class: "",
-    startdate: "",
-    enddate: "",
-    examstarting_time: "",
-    examending_time: "",
-    examsubjects: [{ subject: "", examination_date: "" }],
-  });
-
-
-
+  // Update formData when userId changes
+  useEffect(() => {
+    if (userId) {
+      setFormData((prevData) => ({
+        ...prevData,
+        userId: userId,
+      }));
+    }
+  }, [userId]);
 
   const openModal = () => {
     setIsSelectOpen(true);
