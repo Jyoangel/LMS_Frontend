@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaArrowLeftLong } from "react-icons/fa6";
 import Successcard from "@/Components/Successcard";
 import { addAdmitCardData } from "../../../../../api/reportcardapi"; // api to add admit card data 
