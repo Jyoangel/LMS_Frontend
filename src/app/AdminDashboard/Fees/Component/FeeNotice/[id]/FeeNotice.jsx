@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useEffect, useRef, useState } from "react";
 import { RxCrossCircled } from "react-icons/rx";
@@ -8,6 +8,7 @@ import logo from "../../../Component/logo.png";
 import { sendFeeNotice } from "../../../../../../../api/api"; // Adjust the path based on your project structure
 import { fetchAdminUserByUserId } from "../../../../../../../api/adminUser";
 import { useUser } from '@auth0/nextjs-auth0/client';
+
 export default function FeeNotice({ studentID, onClose }) {
   const [message, setMessage] = useState('');
   const [remark, setRemark] = useState('');
@@ -19,20 +20,21 @@ export default function FeeNotice({ studentID, onClose }) {
   const noticeRef = useRef();
   const { user, isLoading } = useUser(); // Get user from Auth0
 
-  // Fetch admin users in a separate useEffect
   useEffect(() => {
     const fetchUsers = async () => {
-      try {
-        const adminUsers = await fetchAdminUserByUserId(user.sub);
-        console.log(adminUsers); // Fetch admin users
-        setAdminUsers(adminUsers); // Store fetched admin users
-      } catch (error) {
-        console.error('Error fetching admin users:', error);
+      if (user) { // Ensure `user` is defined before accessing `user.sub`
+        try {
+          const adminUsers = await fetchAdminUserByUserId(user.sub);
+          setAdminUsers(adminUsers);
+        } catch (error) {
+          console.error('Error fetching admin users:', error);
+        }
       }
     };
 
-    fetchUsers(); // Call the fetch function
-  }, []); // Empty dependency array means it runs only once when the component mounts
+    fetchUsers();
+  }, [user]); // Add `user` as a dependency to rerun when it changes
+
   useEffect(() => {
     const handleOutsideClick = (event) => {
       if (noticeRef.current && !noticeRef.current.contains(event.target)) {
@@ -49,7 +51,6 @@ export default function FeeNotice({ studentID, onClose }) {
 
   const handleSendNotice = async (e) => {
     e.preventDefault();
-    setError(null);
     setSuccess(false);
 
     const noticeData = {
@@ -74,19 +75,19 @@ export default function FeeNotice({ studentID, onClose }) {
           ref={noticeRef}
           className="h-[600px] w-[500px] border border-blue-500 bg-white rounded-lg flex flex-col gap-3 p-5"
         >
-          <div className="flex flex-row items-center justify-between ">
+          <div className="flex flex-row items-center justify-between">
             <h1 className="text-black text-sm font-semibold">Fees Notice</h1>
             <button role="button" onClick={onClose} className="cursor-pointer">
               <RxCrossCircled size={20} color="gray" />
             </button>
           </div>
           <div className="flex flex-row gap-5 border-b border-gray-500 pb-5">
-            <Image src={adminUsers?.picture} alt="Logo" className="h-[50px] w-[50px] rounded-full"
-              width={70} // Set width to avoid layout shift
-              height={70} />
+            {adminUsers?.picture && (
+              <Image src={adminUsers.picture} alt="Admin Avatar" className="h-[50px] w-[50px] rounded-full" width={70} height={70} />
+            )}
             <div className="flex flex-col gap-1">
               <h1 className="text-black text-lg font-semibold uppercase">
-                {adminUsers?.name}
+                {adminUsers?.name || 'Admin'}
               </h1>
               <p className="text-gray-400 uppercase text-sm leading-5 tracking-wider">
                 barauli gopalganj [ Bihar ]
@@ -155,12 +156,7 @@ export default function FeeNotice({ studentID, onClose }) {
           </form>
           {success && (
             <div className="mt-5 w-full flex justify-center">
-              <Successcard onClose={onClose} para={"Fee notice sent successfully!"} />
-            </div>
-          )}
-          {error && (
-            <div className="mt-5 w-full flex justify-center text-red-500">
-              {error}
+              <Successcard onClose={onClose} para={"Fee notice sent successfully!"} url={`/AdminDashboard/Fees/FeeDetails/${studentID}`} />
             </div>
           )}
         </div>
