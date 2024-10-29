@@ -11,7 +11,7 @@ export default function page() {
     return (
         <div className="h-screen w-full flex flex-col p-5 gap-10">
             <div className="w-full flex justify-between items-center">
-                <Link href="/AdminDashboard/ReportCard" >
+                <Link href="/teacherspanel/ReportCard" >
                     <button className="flex items-center justify-center gap-2">
                         <FaArrowLeftLong className="h-10 w-10 bg-gray-100 rounded-full p-2" />
                         <h1 className="text-lg font-semibold">Back</h1>
@@ -23,7 +23,7 @@ export default function page() {
                     Select
                 </div>
                 {isSelect && <div className="w-96  rounded-md border border-gray-300 px-5 py-2 flex flex-col gap-2">
-                    <Link href="/AdminDashboard/ReportCard/AdmitCard"><h1>Admit Card</h1></Link>
+                    <Link href="/teacherspanel/ReportCard/AdmitCard"><h1>Admit Card</h1></Link>
                     {/* <Link href="/AdminDashboard/ReportCard/AddReportCard"> <h1>Report card</h1></Link> */}
                 </div>}
             </div>
